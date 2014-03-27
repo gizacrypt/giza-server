@@ -120,4 +120,14 @@ abstract class Image implements Serializable {
 	 */
 	public abstract function getImageContentType();
 
+	/**
+	 * Convert the image to a string. This is only used for comparing objects,
+	 * so it returns $this->serialze().
+	 *
+	 * @return string serialised string.
+	 */
+	public function __toString() {
+		return $this->serialize();
+	}
+
 }
