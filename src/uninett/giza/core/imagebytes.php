@@ -1,5 +1,7 @@
 <?php namespace uninett\giza\core;
 
+use \FInfo;
+
 /**
  *
  * @author Jørn Åne de Jong <jorn.dejong@uninett.no>
@@ -39,7 +41,7 @@ class ImageBytes extends Image {
 		if (isset($this->contentType)) {
 			return $this->contentType;
 		}
-		$finfo = new finfo(FILEINFO_MIME);
+		$finfo = new FInfo(FILEINFO_MIME);
 		return $this->contentType = $finfo->buffer($this->getImageBytes());
 	}
 

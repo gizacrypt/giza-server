@@ -1,5 +1,7 @@
 <?php namespace uninett\giza\core;
 
+use \FInfo;
+
 /**
  *
  * @author Jørn Åne de Jong <jorn.dejong@uninett.no>
@@ -29,7 +31,7 @@ class ImageFile extends Image {
 		return $this->file;
 	}
 	public function getImageContentType() {
-		$finfo = new finfo(FILEINFO_MIME);
+		$finfo = new FInfo(FILEINFO_MIME);
 		return $finfo->file($this->getImageFile());
 	}
 
