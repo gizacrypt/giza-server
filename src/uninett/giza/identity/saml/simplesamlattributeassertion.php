@@ -11,15 +11,15 @@ class SimpleSamlAttributeAssertion extends AttributeAssertion {
 
 	private $uid;
 	private $displayNames;
-	private $mailAddresses;
+	private $mails;
 	private $jpegPhotos;
 
-	public function __construct($uid, array $displayNames, array $mailAddresses, array $jpegPhotos) {
+	public function __construct($uid, array $displayNames, array $mails, array $jpegPhotos) {
 		assert('is_string($uid);');
 		$this->uid = $uid;
 
 		$this->displayNames = $displayNames;
-		$this->mailAddresses = $mailAddresses;
+		$this->mails = $mails;
 		$this->jpegPhotos = $jpegPhotos;
 	}
 
@@ -31,8 +31,8 @@ class SimpleSamlAttributeAssertion extends AttributeAssertion {
 		return $this->displayNames;
 	}
 
-	public function getMailAddresses() {
-		return $this->mailAddresses;
+	public function getMails() {
+		return $this->mails;
 	}
 
 	public function getImages() {
