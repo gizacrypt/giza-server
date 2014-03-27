@@ -34,16 +34,7 @@ class SimpleSamlAttributeSource implements AttributeSource {
 			$uid = reset($attributeAssertions)->getUniqueId();
 			$attr = $this->as->getAttributes();
 			if ($uid === reset($attr[$this->uidAttr])) {
-				$images = [];
-				if (isset($attr[$this->jpegPhotoAttr])) {
-					$images = Image::fromBytesArray($attr[$this->jpegPhotoAttr], 'image/jpeg');
-				}
-				return new SimpleSamlAttributeAssertion(
-					reset($attr[$this->uidAttr]),
-					$attr[$this->displayNameAttr],
-					$attr[$this->mailAttr],
-					$images
-				);
+				return $this->getAuthenticationAssertion();
 			}
 		}
 		return null;
@@ -52,8 +43,15 @@ class SimpleSamlAttributeSource implements AttributeSource {
 	public function getAuthenticationAssertion() {
 		$this->as->requireAuth();
 		$attr = $this->as->getAttributes();
+		$images = [];
+		if (isset($attr[$this->jpegPhotoAttr])) {
+			$images = Image::fromBytesArray($attr[$this->jpegPhotoAttr], 'image/jpeg');
+		}
 		return new SimpleSamlAttributeAssertion(
-			reset($attr[$this->uidAttr])
+			reset($attr[$this->uidAttr]),
+			$attr[$this->displayNameAttr],
+			$attr[$this->mailAttr],
+			$images
 		);
 	}
 
