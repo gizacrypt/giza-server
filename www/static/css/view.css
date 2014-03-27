@@ -1,0 +1,38 @@
+#giza-view
+	{ font-size: 125% ;
+	  border-spacing: 0 }
+#giza-view > div
+	{ display: table-row }
+#giza-view > div:nth-child(even)
+	{ background-color: #f0f0f0 }
+#giza-view > div > div
+	{ display: table-cell ;
+	  padding: 0 0.3em }
+#giza-view > div > div > div
+	{ position: relative }
+#giza-view > div > div > div > div
+	{ display: none }
+#giza-view > div > div > div:hover > div {
+	  display: block ;
+	  position: absolute ;
+	  z-index: 1 ;
+	  background-color: white ;
+	  text-align: left ;
+	  white-space: nowrap ;
+	  border: thin solid gray ;
+	  padding: .15em .4em .2em .3em ;
+	  border-radius: 0.25em ;
+	  box-shadow: 0.5em 0.5em 1.5em gray }
+#giza-view > div > div:nth-child(1n+2) > div > div
+	{ right: 0 }
+#giza-view > div > div > div > div > *
+	{ display: table-row }
+#giza-view > div > div > div > div > * > *
+	{ display: table-cell ;
+	  padding: 0 .2em }
+#giza-view img
+	{ height: .85em ;
+	  vertical-align: middle ;
+	  padding-bottom: .2em }
+#giza-view .red
+	{ color: red }

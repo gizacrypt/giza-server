@@ -1,0 +1,12 @@
+body
+	{ margin: 0 auto 0.5em auto ;
+	  padding: 0.5em ;
+	  max-width: 56em ;
+	  background-color: silver;
+	  color: black; }
+a
+	{ text-decoration: none }
+a:hover
+	{ text-decoration: underline }
+a:link, a:visited
+	{ color: black }
