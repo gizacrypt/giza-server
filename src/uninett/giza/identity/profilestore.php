@@ -5,7 +5,7 @@
  * @author Jørn Åne de Jong <jorn.dejong@uninett.no>
  * @copyright Copyright (c) 2014, UNINETT
  */
-interface AttributeStore extends AttributeSource {
+interface ProfileStore extends AttributeSource {
 
 	/**
 	 * Store a profile. If the uid already exists in the store,
@@ -15,7 +15,7 @@ interface AttributeStore extends AttributeSource {
 	 *
 	 * @return void
 	 */
-	function store(MutableAttributeAssertion $assertion);
+	function store(Profile $assertion);
 
 	/**
 	 * Remove a profile from the store.
@@ -24,6 +24,6 @@ interface AttributeStore extends AttributeSource {
 	 *
 	 * @return void
 	 */
-	function remove(MutableAttributeAssertion $assertion);
+	function remove(Profile $assertion);
 
 }
