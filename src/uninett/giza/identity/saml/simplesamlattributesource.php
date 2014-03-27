@@ -45,7 +45,7 @@ class SimpleSamlAttributeSource implements AttributeSource {
 		$attr = $this->as->getAttributes();
 		$images = [];
 		if (isset($attr[$this->jpegPhotoAttr])) {
-			$images = Image::fromBytesArray($attr[$this->jpegPhotoAttr], 'image/jpeg');
+			$images = Image::fromBase64Array($attr[$this->jpegPhotoAttr], 'image/jpeg');
 		}
 		return new SimpleSamlAttributeAssertion(
 			reset($attr[$this->uidAttr]),

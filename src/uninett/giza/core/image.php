@@ -22,6 +22,18 @@ abstract class Image implements Serializable {
 	}
 
 	/**
+	 * Create Image object from a base64 encoded string.
+	 * 
+	 * @param string $imageData raw image data encoded in base64.
+	 * @param string $contentType override content-type detection.
+	 *
+	 * @return ImageBytes	the image object.
+	 */
+	public static function fromBase64($base64, $contentType = null) {
+		return new ImageBytes(base64_decode($base64), $contentType);
+	}
+
+	/**
 	 * Create Image object from file.
 	 * 
 	 * @param string $imageData path to image file.
@@ -44,6 +56,22 @@ abstract class Image implements Serializable {
 		$result = [];
 		foreach($imageDatas as $imageData) {
 			$result[] = Image::fromBytes($imageData, $contentType);
+		}
+		return $result;
+	}
+
+	/**
+	 * Map an array with base64 encoded images to Image objects.
+	 *
+	 * @param string[] $imageDatas	array with base64 encoded image data for each entry.
+	 * @param string $contentType override content-type detection.
+	 *
+	 * @return ImageBytes[]	the image objects.
+	 */
+	public static function fromBase64Array(array $base64s, $contentType = null) {
+		$result = [];
+		foreach($base64s as $base64) {
+			$result[] = Image::fromBase64($base64, $contentType);
 		}
 		return $result;
 	}
