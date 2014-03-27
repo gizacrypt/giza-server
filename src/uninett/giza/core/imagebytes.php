@@ -9,13 +9,16 @@ class ImageBytes extends Image {
 
 	private $bytes;
 
+	private $contentType;
+	
 	/**
 	 * Create Image object from bytes.
 	 * 
 	 * @param string $imageData raw image data.
 	 */
-	public function __construct($bytes) {
+	public function __construct($bytes, $contentType = null) {
 		$this->bytes = $bytes;
+		$this->contentType = $contentType;
 	}
 
 	public function viewImage() {
@@ -33,8 +36,27 @@ class ImageBytes extends Image {
 		return $file;
 	}
 	public function getImageContentType() {
+		if (isset($this->contentType)) {
+			return $this->contentType;
+		}
 		$finfo = new finfo(FILEINFO_MIME);
-		return $finfo->buffer($this->getImageBytes());
+		return $this->contentType = $finfo->buffer($this->getImageBytes());
+	}
+
+	public function serialize() {
+		if (!preg_match('_(?<contentType>[a-z0-9][a-z0-9!#$&\\-\\^\\_\\.\\+]*/[a-z0-9][a-z0-9!#$&\\-\\^\\_\\.\\+]*)_', $this->getImageContentType(), $matches)) {
+			throw new DomainException('Illegal characters in content-type.');
+		}
+		$contentType = $matches['contentType'];
+		return 'data:'.$contentType.';base64,'.base64_encode($this->getImageBytes());
+	}
+	public function unserialize($serialized) {
+		if (preg_match('_data:(?<contentType>[a-z]+);base64,(?<base64>[A-Za-z0-9/\+]+)_i', $serialized, $matches)) {
+			$this->contentType = $matches['contentType'];
+			$this->bytes = base64_decode($matches['base64']);
+		} else {
+			throw new DomainException('Illegal serialized image bytes.');
+		}
 	}
 
 }

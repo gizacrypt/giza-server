@@ -7,7 +7,7 @@ use \Serializable;
  * @author Jørn Åne de Jong <jorn.dejong@uninett.no>
  * @copyright Copyright (c) 2014, UNINETT
  */
-abstract class Image {
+abstract class Image implements Serializable {
 
 	/**
 	 * Create Image object from bytes.

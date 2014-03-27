@@ -16,4 +16,12 @@ class NoImage extends ImageFile {
 		parent::viewImage();
 	}
 
+	public function serialize() {
+		return '';
+	}
+
+	public function unserialize($serialized) {
+		$this->__construct();
+	}
+
 }
