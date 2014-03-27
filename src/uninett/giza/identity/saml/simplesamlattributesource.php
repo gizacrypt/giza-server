@@ -52,7 +52,7 @@ class SimpleSamlAttributeSource implements AttributeSource {
 	public function getAuthenticationAssertion() {
 		$this->as->requireAuth();
 		$attr = $this->as->getAttributes();
-		return new SimpleSamlIdentityAssertion(
+		return new SimpleSamlAttributeAssertion(
 			reset($attr[$this->uidAttr])
 		);
 	}
