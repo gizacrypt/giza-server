@@ -13,11 +13,12 @@ abstract class Image implements Serializable {
 	 * Create Image object from bytes.
 	 * 
 	 * @param string $imageData raw image data.
+	 * @param string $contentType override content-type detection.
 	 *
 	 * @return ImageBytes	the image object.
 	 */
-	public static function fromBytes($bytes) {
-		return new ImageBytes($bytes);
+	public static function fromBytes($bytes, $contentType = null) {
+		return new ImageBytes($bytes, $contentType);
 	}
 
 	/**
@@ -35,13 +36,14 @@ abstract class Image implements Serializable {
 	 * Map an array with raw images to Image objects.
 	 *
 	 * @param string[] $imageDatas	array with raw image data for each entry.
+	 * @param string $contentType override content-type detection.
 	 *
 	 * @return ImageBytes[]	the image objects.
 	 */
-	public static function fromBytesArray(array $imageDatas) {
+	public static function fromBytesArray(array $imageDatas, $contentType = null) {
 		$result = [];
 		foreach($imageDatas as $imageData) {
-			$result[] = Image::fromBytes($imageData);
+			$result[] = Image::fromBytes($imageData, $contentType);
 		}
 		return $result;
 	}
