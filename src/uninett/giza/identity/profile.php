@@ -81,7 +81,7 @@ class Profile extends AttributeAssertion {
 	 *
 	 * @return AttributeAssertion[] list of attribute assertions.
 	 */
-	protected function getAttributeAssertions() {
+	public function getAttributeAssertions() {
 		return $this->attributeAssertions;
 	}
 
