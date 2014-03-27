@@ -39,7 +39,7 @@ abstract class AttributeAssertion {
 					);
 				}
 				if ($assertion) {
-					$assertions[] = $assertion;
+					$assertions[$name] = $assertion;
 				}
 			}
 		}
