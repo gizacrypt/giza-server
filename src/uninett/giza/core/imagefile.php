@@ -33,11 +33,6 @@ class ImageFile extends Image {
 		return $finfo->file($this->getImageFile());
 	}
 
-	/**
-	 * Extract the image and return it as ImageBytes object.
-	 * This is useful for serialising, as the source image could be moved after serialisation,
-	 * making the unserialize method in this class unreliable.
-	 */
 	public function toBytes() {
 		return new ImageBytes($this->getImageBytes(), $this->getImageContentType());
 	}

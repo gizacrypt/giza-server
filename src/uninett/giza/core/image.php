@@ -62,6 +62,13 @@ abstract class Image implements Serializable {
 	}
 
 	/**
+	 * Extract the image and return it as ImageBytes object.
+	 * This is useful for serialising, as the source image could be moved after serialisation,
+	 * making the unserialize method in this class unreliable.
+	 */
+	public abstract function toBytes();
+
+	/**
 	 * Output image to the webbrowser, with correct Content-type header
 	 * If not image is available, a 404 is sent, along with a preconfigured image.
 	 * This function will not return.
