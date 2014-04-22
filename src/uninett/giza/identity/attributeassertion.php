@@ -1,6 +1,7 @@
 <?php namespace uninett\giza\identity;
 
 use \DomainException;
+use \LogicException;
 use \Serializable;
 
 use \uninett\giza\core\Image;

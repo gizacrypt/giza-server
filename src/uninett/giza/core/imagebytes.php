@@ -50,7 +50,9 @@ class ImageBytes extends Image {
 	}
 
 	public function serialize() {
-		if (!preg_match('_(?<contentType>[a-z0-9][a-z0-9!#$&\\-\\^\\_\\.\\+]*/[a-z0-9][a-z0-9!#$&\\-\\^\\_\\.\\+]*)_', $this->getImageContentType(), $matches)) {
+		if (!preg_match(
+			'_(?<contentType>[a-z0-9][a-z0-9!#$&\\-\\^\\_\\.\\+]*/[a-z0-9][a-z0-9!#$&\\-\\^\\_\\.\\+]*)_',
+			$this->getImageContentType(), $matches)) {
 			throw new DomainException('Illegal characters in content-type.');
 		}
 		$contentType = $matches['contentType'];

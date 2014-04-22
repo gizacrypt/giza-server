@@ -1,8 +1,9 @@
 <?php namespace uninett\giza\core;
 
-use \Serializable;
 use \DateTime;
+use \LogicException;
 use \ReflectionClass;
+use \Serializable;
 
 /**
  * 

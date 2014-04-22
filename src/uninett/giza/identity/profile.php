@@ -1,6 +1,6 @@
 <?php namespace uninett\giza\identity;
 
-use \DomainException;
+use \LogicException;
 
 use \uninett\giza\core\Image;
 
@@ -55,18 +55,18 @@ class Profile extends AttributeAssertion {
 	 */
 	public function __construct(array $attributeAssertions) {
 		if (!$attributeAssertions) {
-			throw new DomainException('At least one attribute assertion is required to construct a profile.');
+			throw new LogicException('At least one attribute assertion is required to construct a profile.');
 		}
 		foreach($attributeAssertions as $assertion) {
 			$uid = $assertion->getUniqueId();
 			if (!isset($uid)) {
-				throw new DomainException('Cannot construct a profile from an attribute assertion without UID.');
+				throw new LogicException('Cannot construct a profile from an attribute assertion without UID.');
 			}
 			if (!isset($this->uid)) {
 				$this->uid = $uid;
 			}
 			if ($this->uid !== $uid) {
-				throw new DomainException('All attribute assertions used to construct a profile must have the same UID.');
+				throw new LogicException('All attribute assertions used to construct a profile must have the same UID.');
 			}
 		}
 		$this->attributeAssertions = $attributeAssertions;
