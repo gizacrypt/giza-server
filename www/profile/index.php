@@ -46,7 +46,7 @@ foreach(array_merge([$profile], $profile->getAttributeAssertions()) as $source =
 		$mail = isset($mails[$i]) ? htmlentities($mails[$i]) : '';
 		$image = isset($images[$i]) ? '<img src="'.htmlentities($images[$i]->toBytes()->serialize()).'" alt="">' : '';
 		$sshKey = isset($sshKeys[$i]) ? htmlspecialchars($sshKeys[$i]->getHexFingerprint()) : '';
-		$pgpKey = '';
+		$pgpKey = isset($pgpKeys[$i]) ? htmlspecialchars($pgpKeys[$i]->getKeyID()) : '';
 ?>
 	<td><?php echo $displayName; ?></td>
 	<td><?php echo $mail; ?></td>

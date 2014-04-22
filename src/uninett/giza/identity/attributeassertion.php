@@ -5,11 +5,29 @@ use \LogicException;
 use \Serializable;
 
 use \uninett\giza\core\Image;
+use \uninett\giza\core\LDIFSerializable;
 use \uninett\giza\core\NoImage;
+use \uninett\giza\core\PGPPublicKey;
+use \uninett\giza\core\SSHPublicKey;
 
-abstract class AttributeAssertion {
+class AttributeAssertion extends LDIFSerializable {
 
-	public function __construct() {}
+	private $uid;
+	private $displayNames;
+	private $mails;
+	private $images;
+	private $pgpPublicKeys;
+	private $sshPublicKeys;
+
+	public function __construct($attributes = null) {
+		if (is_null($attributes)) {
+			return;
+		} elseif (is_string($attributes)) {
+			$this->unserialize($attributes);
+		} elseif (is_array($attributes)) {
+			$this->setAttributes($attributes);
+		} else throw new LogicException('Illegal type for attributes; not string or array');
+	}
 
 	/**
 	 * Collect different assertion objects for a uid.
@@ -34,9 +52,9 @@ abstract class AttributeAssertion {
 				if ($testUid !== $uid) {
 					throw new DomainException(
 						'Unique ID must be consistent over all assertions. '
-						.htmlentities($name)
-						.' fails to keep this promise and returned '
-						.htmlentities($testUid).'.'
+						. htmlentities($name)
+						. ' fails to keep this promise and returned '
+						. htmlentities($testUid).'.'
 					);
 				}
 				if ($assertion) {
@@ -47,11 +65,62 @@ abstract class AttributeAssertion {
 		return $assertions;
 	}
 
+	protected function getAttributes() {
+		return [
+			'uid' => [$this->uid],
+			'displayName' => $this->displayNames,
+			'mail' => $this->mails,
+			'image' => $this->images,
+			'pGPKeys' => $this->pgpPublicKeys,
+			'sSHKeys' => $this->sshPublicKeys,
+		];
+	}
+
+	protected function setAttributes($attributes) {
+		$this->uid = reset($attributes['uid']);
+		if (isset($attributes['displayName'])) {
+			$this->displayNames = $attributes['displayName'];
+		} else {
+			$this->displayNames = [];
+		}
+		if (isset($attributes['mail'])) {
+			$this->mails = $attributes['mail'];
+		} else {
+			$this->mails = [];
+		}
+		$this->images = [];
+		if (isset($attributes['image'])) foreach($attributes['image'] as $image) {
+			if ($image instanceof Image) {
+				$this->images[] = $image;
+			} else {
+				$this->images[] = Image::imageFromBytes($image);
+			}
+		}
+		$this->pgpPublicKeys = [];
+		if (isset($attributes['pGPKeys'])) foreach($attributes['pGPKeys'] as $pgpPublicKey) {
+			if ($pgpPublicKey instanceof PGPPublicKey) {
+				$this->pgpPublicKeys[] = $pgpPublicKey;
+			} else {
+				$this->pgpPublicKeys[] = new PGPPublicKey($pgpPublicKey);
+			}
+		}
+		$this->sshPublicKeys = [];
+		if (isset($attributes['sSHKeys'])) foreach($attributes['sSHKeys'] as $sshPublicKey) {
+			if ($sshPublicKey instanceof SSHPublicKey) {
+				$this->sshPublicKeys[] = $sshPublicKey;
+			} else {
+				$this->sshPublicKeys[] = new SSHPublicKey($sshPublicKey);
+			}
+		}
+	}
+
 	/**
 	 * Get unique ID in this assertion
 	 * @return string uid
 	 */
-	abstract public function getUniqueId();
+	public function getUniqueId() {
+		return $this->uid;
+	}
 	/**
 	 * Get display name for this assertion
 	 * @return string
@@ -68,7 +137,7 @@ abstract class AttributeAssertion {
 	 * @return string[] display names
 	 */
 	public function getDisplayNames() {
-		return [];
+		return $this->displayNames;
 	}
 	/**
 	 * Get e-mail address from this assertion
@@ -86,7 +155,7 @@ abstract class AttributeAssertion {
 	 * @return string[] e-mail addresses
 	 */
 	public function getMails() {
-		return [];
+		return $this->mails;
 	}
 
 	/**
@@ -106,21 +175,21 @@ abstract class AttributeAssertion {
 	 * @return Image[] images
 	 */
 	public function getImages() {
-		return [];
+		return $this->images;
 	}
 	/**
 	 * Get the PGP public keys from this assertion
 	 * @return GPGKey[] the PGP public keys
 	 */
 	public function getPGPPublicKeys() {
-		return [];
+		return $this->pgpPublicKeys;
 	}
 	/**
 	 * Get the SSH public keys from this assertion
 	 * @return SSHKey[] SSH public keys
 	 */
 	public function getSSHPublicKeys() {
-		return [];
+		return $this->sshPublicKeys;
 	}
 
 }

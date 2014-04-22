@@ -2,6 +2,7 @@
 
 use \uninett\giza\core\Image;
 
+use \uninett\giza\identity\AttributeAssertion;
 use \uninett\giza\identity\AttributeSource;
 
 use \SimpleSAML_Auth_Simple;
@@ -30,9 +31,9 @@ class SimpleSamlAttributeSource implements AttributeSource {
 	}
 
 	public function getAssertionFor(array $attributeAssertions) {
-		if ($attributeAssertions) {
-			$uid = reset($attributeAssertions)->getUniqueId();
-			$attr = $this->as->getAttributes();
+		$attr = $this->as->getAttributes();
+		foreach ($attributeAssertions as $assertion) {
+			$uid = $assertion->getUniqueId();
 			if ($uid === reset($attr[$this->uidAttr])) {
 				return $this->getAuthenticationAssertion();
 			}
@@ -47,12 +48,12 @@ class SimpleSamlAttributeSource implements AttributeSource {
 		if (isset($attr[$this->jpegPhotoAttr])) {
 			$images = Image::fromBase64Array($attr[$this->jpegPhotoAttr], 'image/jpeg');
 		}
-		return new SimpleSamlAttributeAssertion(
-			reset($attr[$this->uidAttr]),
-			$attr[$this->displayNameAttr],
-			$attr[$this->mailAttr],
-			$images
-		);
+		return new AttributeAssertion([
+			'uid' => $attr[$this->uidAttr],
+			'displayName' => $attr[$this->displayNameAttr],
+			'mail' => $attr[$this->mailAttr],
+			'image' => $images
+		]);
 	}
 
 }

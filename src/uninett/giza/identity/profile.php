@@ -27,6 +27,8 @@ class Profile extends AttributeAssertion {
 	 */
 	protected $attributeAssertions;
 
+	protected $singleValueAttributes = ['uid', 'displayName', 'mail', 'image'];
+
 	/**
 	 * Create a profile from a give UID
 	 *
@@ -161,6 +163,30 @@ class Profile extends AttributeAssertion {
 	}
 	public function getSSHPublicKeys() {
 		return $this->collectFieldValues('SSHPublicKeys');
+	}
+
+	public function getAttributes() {
+		$elements = [
+			'uid' => [$this->uid],
+			'displayName' => [$this->displayName],
+			'mail' => [$this->mail],
+			'image' => [$this->image],
+			'assertion' => [],
+		];
+		foreach($this->attributeAssertions as $assertion) {
+			$elements['assertion'] = $assertion->serialize();
+		}
+		return $elements;
+	}
+
+	public function setAttributes($attributes) {
+		$this->uid = reset($attributes['uid']);
+		$this->displayNames = $attributes['displayName'];
+		$this->mails = $attributes['mail'];
+		$this->images = $attributes['image'];
+		foreach($attributes['assertion'] as $assertionSerialized) {
+			$this->attributeAssertions[] = new AttributeAssertion($assertionSerialized);
+		}
 	}
 
 }
