@@ -31,7 +31,7 @@ class FileProfileStore implements ProfileStore {
 		if (!isset($uid)) {
 			throw new LogicException('No UID found');
 		}
-		$profile = new Profile($uid);
+		$profile = $this->getProfile($uid);
 		foreach($profile->getAttributeAssertions() as $assertion) {
 			if (!in_array($assertion, $attributeAssertions)) {
 				return null;
@@ -55,6 +55,25 @@ class FileProfileStore implements ProfileStore {
 			throw new RuntimeException('Unable to write file.');
 		}
 		chmod($filename, 0400);
+	}
+
+	protected function getProfile($uid) {
+		$filename = $uid.'.';
+		$handle = opendir($this->path);
+		if (!$handle) {
+			throw new RuntimeException('Unable to access profile directory');
+		}
+		$files = [];
+		while (false !== ($entry = readdir($handle))) {
+			if (substr($entry, 0, strlen($filename)) === $filename) {
+				$files[] = $entry;
+			}
+		}
+		rsort($files);
+		$reflect = new ReflectionClass('\\uninett\\giza\\identity\\Profile');
+		$profile = $reflect->newInstanceWithoutConstructor();
+		$profile->unserialize(file_get_contents(reset($files)));
+		return $profile;
 	}
 
 }

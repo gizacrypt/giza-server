@@ -1,6 +1,9 @@
 <?php namespace uninett\giza\core;
 
+use \FilesystemIterator;
 use \LogicException;
+use \RecursiveIteratorIterator;
+use \RecursiveDirectoryIterator;
 use \RuntimeException;
 use \Serializable;
 
@@ -32,17 +35,17 @@ class PGPPublicKey implements Serializable {
 			return;
 		}
 
-		$file = tempnam(sys_get_temp_dir(), 'gpg');
+		$gpgDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'gpg' . microtime(true);
+		mkdir($gpgDir);
+		chmod($gpgDir, 0700);
 		$readSpec = [0 => ['pipe', 'r']];
 		$writeSpec = [1 => ['pipe', 'w']];
 
 		try {
 			$process = proc_open(
 				escapeshellcmd($GLOBALS['gizaConfig']['gpgBinary'])
-				. ' --import --no-default-keyring --keyring '
-				. escapeshellarg($file)
-				. ' --homedir '
-				. sys_get_temp_dir(), 
+				. ' --import --homedir '
+				. escapeshellarg($gpgDir),
 				$readSpec, 
 				$pipes, 
 				sys_get_temp_dir(), 
@@ -53,15 +56,10 @@ class PGPPublicKey implements Serializable {
 				fclose($pipes[0]);
 				proc_close($process);
 			}
-			if (!filesize($file)) {
-				throw new LogicException('GPG keyring is zero bytes; import supposedly failed');
-			}
 			$process = proc_open(
 				escapeshellcmd($GLOBALS['gizaConfig']['gpgBinary'])
-				. ' --list-sigs --with-colons --no-default-keyring --keyring '
-				. escapeshellarg($file)
-				. ' --homedir '
-				. sys_get_temp_dir(), 
+				. ' --list-sigs --with-colons --homedir '
+				. escapeshellarg($gpgDir),
 				$writeSpec, 
 				$pipes, 
 				sys_get_temp_dir(), 
@@ -75,7 +73,18 @@ class PGPPublicKey implements Serializable {
 		} catch (Exception $e) {
 			die($e->getMessage());
 		} //finally {
-			unlink($file);
+			$iterator = new RecursiveIteratorIterator(
+				new RecursiveDirectoryIterator($gpgDir, FilesystemIterator::SKIP_DOTS),
+				RecursiveIteratorIterator::CHILD_FIRST
+			);
+			foreach ($iterator as $filename => $fileInfo) {
+				if ($fileInfo->isDir()) {
+					rmdir($filename);
+				} else {
+					unlink($filename);
+				}
+			}
+			rmdir($gpgDir);
 		//}
 	}
 	
