@@ -1,6 +1,7 @@
 <?php namespace uninett\giza\identity\file;
 
 use \ReflectionClass;
+use \RuntimeException;
 
 use \uninett\giza\core\Image;
 
@@ -57,7 +58,7 @@ class FileProfileStore implements ProfileStore {
 		chmod($filename, 0400);
 	}
 
-	protected function getProfile($uid) {
+	public function getProfile($uid) {
 		$filename = $uid.'.';
 		$handle = opendir($this->path);
 		if (!$handle) {
@@ -69,11 +70,14 @@ class FileProfileStore implements ProfileStore {
 				$files[] = $entry;
 			}
 		}
-		rsort($files);
-		$reflect = new ReflectionClass('\\uninett\\giza\\identity\\Profile');
-		$profile = $reflect->newInstanceWithoutConstructor();
-		$profile->unserialize(file_get_contents(reset($files)));
-		return $profile;
+		if (!empty($files)) {
+			rsort($files);
+			$reflect = new ReflectionClass('\\uninett\\giza\\identity\\Profile');
+			$profile = $reflect->newInstanceWithoutConstructor();
+			$profile->unserialize(file_get_contents($this->path.DIRECTORY_SEPARATOR.reset($files)));
+			return $profile;
+		}
+		return null;
 	}
 
 }

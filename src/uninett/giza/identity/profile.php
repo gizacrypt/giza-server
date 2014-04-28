@@ -27,7 +27,7 @@ class Profile extends AttributeAssertion {
 	 */
 	protected $attributeAssertions;
 
-	protected $singleValueAttributes = ['uid', 'displayName', 'mail', 'image'];
+	protected $singleValueAttributes = ['uid', 'displayName', 'mail', 'photo'];
 
 	/**
 	 * Create a profile from the authenticated identity
@@ -48,6 +48,40 @@ class Profile extends AttributeAssertion {
 	public static function fromUid($uid) {
 		$identities = AttributeAssertion::collect($uid);
 		return new Profile($identities);
+	}
+	/**
+	 * Load profile from the profile store.
+	 * This method will return NULL if the profile was not stored before
+	 *
+	 * This is a convenience function that calls the ProfileStore#getProfile(string) method.
+	 *
+	 * @todo Allow retrieval of older version
+	 *
+	 * @param string $uid uid or null for authenticated user
+	 * @param string $revision TODO revision string or null for latest
+	 *
+	 * @return Profile Profile or NULL if not previously stored
+	 */
+	public static function fromStore($uid = null, $revision = null) {
+		if (isset($revision)) {
+			throw new LogicException('Retrieval of older profile not implemented.');
+		}
+		if (is_null($uid)) {
+			$profile = Profile::fromAuthentication();
+			if (is_null($profile)) {
+				return null;
+			}
+			$uid = $profile->getUniqueId();
+		}
+		return $GLOBALS['gizaConfig']['profileStore']->getProfile($uid);
+	}
+	/**
+	 * Store the profile in the profile store.
+	 *
+	 * This is a convenience function that calls the ProfileStore#store() method.
+	 */
+	public function store() {
+		$GLOBALS['gizaConfig']['profileStore']->store($this);
 	}
 
 	/**
@@ -179,11 +213,11 @@ class Profile extends AttributeAssertion {
 			'uid' => [$this->uid],
 			'displayName' => [$this->displayName],
 			'mail' => [$this->mail],
-			'image' => [$this->image],
+			'photo' => isset($this->image) ? [$this->image->getImageBytes()] : [],
 			'assertion' => [],
 		];
 		foreach($this->attributeAssertions as $assertion) {
-			$elements['assertion'] = $assertion->serialize();
+			$elements['assertion'][] = $assertion->serialize();
 		}
 		return $elements;
 	}
@@ -192,7 +226,11 @@ class Profile extends AttributeAssertion {
 		$this->uid = reset($attributes['uid']);
 		$this->displayNames = $attributes['displayName'];
 		$this->mails = $attributes['mail'];
-		$this->images = $attributes['image'];
+		if (isset($attributes['photo'])) foreach($attributes['photo'] as $image) {
+			$this->images = Image::fromBytes($image);
+		} else {
+			$this->images = [];
+		}
 		foreach($attributes['assertion'] as $assertionSerialized) {
 			$this->attributeAssertions[] = new AttributeAssertion($assertionSerialized);
 		}

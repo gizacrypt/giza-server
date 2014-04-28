@@ -6,12 +6,36 @@
  * @copyright Copyright (c) 2014, UNINETT
  */
 
-$title = 'Profile';
+$candidateProfile = uninett\giza\identity\Profile::fromAuthentication();
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+	if (isset($_POST['storeProfile'])) {
+		$candidateProfile->store();
+	}
+	header('Location: https://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
+}
 
-$profile = uninett\giza\identity\Profile::fromAuthentication();
+$storedProfile = uninett\giza\identity\Profile::fromStore();
+
+$profile = isset($storedProfile) ? $storedProfile : $candidateProfile;
+
+$title = 'Profile';
 
 ?><!DOCTYPE html>
 <title><?php htmlentities($title); ?></title>
+<?php
+if (is_null($storedProfile)) {
+	echo "<form action=\"./\" method=\"post\">\n";
+}
+echo '<p>Source: ' . (isset($storedProfile) ? 'store' : 'attribute source');
+echo "\n";
+if (is_null($storedProfile)) {
+	echo "<input type=\"submit\" name=\"storeProfile\" value=\"Store profile\"/>\n";
+}
+echo "</p>\n";
+if (is_null($storedProfile)) {
+	echo "</form>\n";
+}
+?>
 <table>
 <tr>
 	<th>source</th>
@@ -24,6 +48,9 @@ $profile = uninett\giza\identity\Profile::fromAuthentication();
 </tr>
 <?php
 foreach(array_merge([$profile], $profile->getAttributeAssertions()) as $source => $assertion) {
+	if (is_int($source) && $source) {
+		continue;
+	}
 	$displayNames = $assertion->getDisplayNames();
 	$mails = $assertion->getMails();
 	$images = $assertion->getImages();

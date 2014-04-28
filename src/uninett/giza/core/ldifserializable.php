@@ -1,5 +1,6 @@
 <?php namespace uninett\giza\core;
 
+use \LogicException;
 use \Serializable;
 
 /**
@@ -18,20 +19,32 @@ abstract class LDIFSerializable implements Serializable {
 	public function serialize() {
 		$result = '';
 		$elements = $this->getAttributes();
-		foreach($elements as $attributeName => $values) foreach($values as $valueData) {
-			if (preg_match('/[^\x20-\x7f]/', $valueData)) {
-				$line = $attributeName . ': ' . $valueData . "\n";
-			} else {
-				$line = $attributeName . ':: ' . base64_encode($valueData) . "\n";
+		foreach($elements as $attributeName => $values) {
+			if (!is_array($values)) {
+				throw new LogicException('The value for '.$attributeName.' is not an array.');
 			}
-			if (strlen($line) > 80) {
-				if (preg_match('/^[^\\x20-\\x7f\\s][^\\x20-\\x7f][^\\x20-\\x7f\\s]+$/', $valueData)) {
-					$line = $attributeName . ": \n" . implode("\n ", str_split($valueData, 80)) . "\n";
-				} else {
-					$line = $attributeName . ":: \n" . implode("\n ", str_split(base64_encode($valueData), 80)) . "\n";
+			foreach($values as $valueData) {
+				if (is_object($valueData)) {
+					if ($valueData instanceof Serializable) {
+						$valueData = $valueData->serialize();
+					} else {
+						throw new LogicException('The object for value '.$attributeName.' is not Serializable.');
+					}
 				}
+				if (preg_match('/[^\x20-\x7f]/', $valueData)) {
+					$line = $attributeName . ':: ' . base64_encode($valueData) . "\n";
+				} else {
+					$line = $attributeName . ': ' . $valueData . "\n";
+				}
+				if (strlen($line) > 80) {
+					if (preg_match('/^[^\\x20-\\x7f\\s][^\\x20-\\x7f][^\\x20-\\x7f\\s]+$/', $valueData)) {
+						$line = $attributeName . ": \n " . implode("\n ", str_split($valueData, 80)) . "\n";
+					} else {
+						$line = $attributeName . ":: \n " . implode("\n ", str_split(base64_encode($valueData), 80)) . "\n";
+					}
+				}
+				$result .= $line;
 			}
-			$result .= $line;
 		}
 		return $result;
 	}
@@ -72,10 +85,11 @@ abstract class LDIFSerializable implements Serializable {
 					$attributeValue = NULL;
 					$b64Encoded = false;
 				} else {
-					throw new LogicException('Invalid LDIF on line '.$lineNr);
+					throw new LogicException('Invalid LDIF on line '.($lineNr+1));
 				}
 			}
 		}
+		$this->setAttributes($result);
 	}
 
 }

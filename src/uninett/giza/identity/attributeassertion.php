@@ -66,11 +66,17 @@ class AttributeAssertion extends LDIFSerializable {
 	}
 
 	protected function getAttributes() {
+		$images = [];
+		foreach($this->images as $image) {
+			if ($image) {
+				$images[] = $image->getImageBytes();
+			}
+		}
 		return [
 			'uid' => [$this->uid],
 			'displayName' => $this->displayNames,
 			'mail' => $this->mails,
-			'image' => $this->images,
+			'photo' => $images,
 			'pGPKeys' => $this->pgpPublicKeys,
 			'sSHKeys' => $this->sshPublicKeys,
 		];
@@ -89,11 +95,11 @@ class AttributeAssertion extends LDIFSerializable {
 			$this->mails = [];
 		}
 		$this->images = [];
-		if (isset($attributes['image'])) foreach($attributes['image'] as $image) {
+		if (isset($attributes['photo'])) foreach($attributes['photo'] as $image) {
 			if ($image instanceof Image) {
 				$this->images[] = $image;
 			} else {
-				$this->images[] = Image::imageFromBytes($image);
+				$this->images[] = Image::fromBytes($image);
 			}
 		}
 		$this->pgpPublicKeys = [];

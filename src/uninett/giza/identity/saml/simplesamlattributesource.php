@@ -52,7 +52,7 @@ class SimpleSamlAttributeSource implements AttributeSource {
 			'uid' => $attr[$this->uidAttr],
 			'displayName' => $attr[$this->displayNameAttr],
 			'mail' => $attr[$this->mailAttr],
-			'image' => $images
+			'photo' => $images
 		]);
 	}
 
