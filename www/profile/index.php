@@ -8,7 +8,7 @@
 
 $title = 'Profile';
 
-$profile = uninett\giza\identity\Profile::fromUid();
+$profile = uninett\giza\identity\Profile::fromAuthentication();
 
 ?><!DOCTYPE html>
 <title><?php htmlentities($title); ?></title>

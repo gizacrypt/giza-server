@@ -30,22 +30,24 @@ class Profile extends AttributeAssertion {
 	protected $singleValueAttributes = ['uid', 'displayName', 'mail', 'image'];
 
 	/**
-	 * Create a profile from a give UID
+	 * Create a profile from the authenticated identity
+	 *
+	 * @return Profile
+	 */
+	public static function fromAuthentication() {
+		$identities = AttributeAssertion::collect(null);
+		return new Profile($identities);
+	}
+	/**
+	 * Create a profile from a given UID
 	 *
 	 * @param string $uid
 	 *
 	 * @return Profile
 	 */
-	public static function fromUid($uid = null) {
+	public static function fromUid($uid) {
 		$identities = AttributeAssertion::collect($uid);
-		$profile = new Profile($identities);
-		$profile->setDisplayName(reset($profile->getDisplayNames()));
-		$profile->setMail(reset($profile->getMails()));
-		$images = $profile->getImages();
-		if ($images) {
-			$profile->setImage(reset($images));
-		}
-		return $profile;
+		return new Profile($identities);
 	}
 
 	/**
@@ -72,6 +74,13 @@ class Profile extends AttributeAssertion {
 			}
 		}
 		$this->attributeAssertions = $attributeAssertions;
+		$this->setDisplayName(reset($this->getDisplayNames()));
+		$this->setMail(reset($this->getMails()));
+		$images = $this->getImages();
+		if ($images) {
+			$this->setImage(reset($images));
+		}
+
 	}
 
 	public function getUniqueId() {
