@@ -1,9 +1,6 @@
 <?php namespace uninett\giza\core;
 
-use \FilesystemIterator;
 use \LogicException;
-use \RecursiveIteratorIterator;
-use \RecursiveDirectoryIterator;
 use \RuntimeException;
 use \Serializable;
 
@@ -35,57 +32,10 @@ class PGPPublicKey implements Serializable {
 			return;
 		}
 
-		$gpgDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'gpg' . microtime(true);
-		mkdir($gpgDir);
-		chmod($gpgDir, 0700);
-		$readSpec = [0 => ['pipe', 'r']];
-		$writeSpec = [1 => ['pipe', 'w']];
-
-		try {
-			$process = proc_open(
-				escapeshellcmd($GLOBALS['gizaConfig']['gpgBinary'])
-				. ' --import --homedir '
-				. escapeshellarg($gpgDir),
-				$readSpec, 
-				$pipes, 
-				sys_get_temp_dir(), 
-				[]
-			);
-			if (is_resource($process)) {
-				fwrite($pipes[0], $this->getFullKey());
-				fclose($pipes[0]);
-				proc_close($process);
-			}
-			$process = proc_open(
-				escapeshellcmd($GLOBALS['gizaConfig']['gpgBinary'])
-				. ' --list-sigs --with-colons --homedir '
-				. escapeshellarg($gpgDir),
-				$writeSpec, 
-				$pipes, 
-				sys_get_temp_dir(), 
-				[]
-			);
-			if (is_resource($process)) {
-				$this->keyList = explode("\n", stream_get_contents($pipes[1]));
-				fclose($pipes[1]);
-				proc_close($process);
-			}
-		} catch (Exception $e) {
-			die($e->getMessage());
-		} //finally {
-			$iterator = new RecursiveIteratorIterator(
-				new RecursiveDirectoryIterator($gpgDir, FilesystemIterator::SKIP_DOTS),
-				RecursiveIteratorIterator::CHILD_FIRST
-			);
-			foreach ($iterator as $filename => $fileInfo) {
-				if ($fileInfo->isDir()) {
-					rmdir($filename);
-				} else {
-					unlink($filename);
-				}
-			}
-			rmdir($gpgDir);
-		//}
+		$gpg = new GPG();
+		$gpg->importKey($this);
+		$this->keyList = $gpg->listSigs();
+		$gpg->finalize();
 	}
 	
 	/**
