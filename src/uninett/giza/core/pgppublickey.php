@@ -53,13 +53,15 @@ class PGPPublicKey implements Serializable {
 				return $segments[4];
 			}
 		}
-		throw new Exception('No public key in output?');
+		throw new Exception('No public key in output!?');
 	}
 
 	/**
 	 * Get a list of all key IDs that are signatures
 	 *
 	 * @param int $minimalTrust	The minimal trust level of the signature (max 3)
+	 *
+	 * @return GPGSignature
 	 */
 	public function getSignatures($minimalTrust = 0) {
 		assert('$minimalTrust >= 0 && $minimalTrust <= 3');

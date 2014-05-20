@@ -3,6 +3,7 @@
 use \FilesystemIterator;
 use \RecursiveIteratorIterator;
 use \RecursiveDirectoryIterator;
+use \RuntimeException;
 
 /**
  *
@@ -38,11 +39,16 @@ class GPG {
 			$this->isTemp = true;
 			mkdir($this->dir);
 			chmod($this->dir, 0700);
+			register_shutdown_function([$this, 'finalize']);
 		} elseif (!is_dir($directory)) {
 			$this->dir = $directory;
 			$this->isTemp = false;
-			mkdir($this->dir);
-			chmod($this->dir, 0700);
+			if (!mkdir($this->dir)) {
+				throw new RuntimeException('GPG homedir does not exist and cannot be created.');
+			}
+			if (chmod($this->dir, 0700)) {
+				throw new RuntimeException('Unable to restrict permissions to GPG homedir.');
+			}
 		} else {
 			$this->dir = $directory;
 			$this->isTemp = false;
@@ -79,7 +85,7 @@ class GPG {
 	}
 
 	public function finalize() {
-		if (!$this->isTemp) {
+		if (!$this->isTemp || !is_dir($this->dir)) {
 			return;
 		}
 		$iterator = new RecursiveIteratorIterator(
