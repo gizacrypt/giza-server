@@ -60,24 +60,20 @@ class FileProfileStore implements ProfileStore {
 
 	public function getProfile($uid) {
 		$filename = $uid.'.';
-		$handle = opendir($this->path);
-		if (!$handle) {
+		$files = glob(
+			rtrim($this->path, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $filename . '*',
+			GLOB_NOSORT|GLOB_NOESCAPE|GLOB_MARK|GLOB_ERR
+		);
+		if (!is_array($files)) {
 			throw new RuntimeException('Unable to access profile directory');
+		} elseif (empty($files)) {
+			return null;
 		}
-		$files = [];
-		while (false !== ($entry = readdir($handle))) {
-			if (substr($entry, 0, strlen($filename)) === $filename) {
-				$files[] = $entry;
-			}
-		}
-		if (!empty($files)) {
-			rsort($files);
-			$reflect = new ReflectionClass('\\uninett\\giza\\identity\\Profile');
-			$profile = $reflect->newInstanceWithoutConstructor();
-			$profile->unserialize(file_get_contents($this->path.DIRECTORY_SEPARATOR.reset($files)));
-			return $profile;
-		}
-		return null;
+		rsort($files);
+		$reflect = new ReflectionClass('\\uninett\\giza\\identity\\Profile');
+		$profile = $reflect->newInstanceWithoutConstructor();
+		$profile->unserialize(file_get_contents(reset($files)));
+		return $profile;
 	}
 
 	public function getNewestProfiles() {
