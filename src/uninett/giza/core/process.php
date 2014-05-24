@@ -39,6 +39,20 @@ class Process {
 		}
 		fwrite($this->pipes[$pipeNumber], $input);
 	}
+	public function closeInput($pipeNumber = -1) {
+		if (!is_int($pipeNumber) || $pipeNumber < 0) {
+			foreach($this->descriptor as $id => $stream) {
+				if ($stream[0] === 'pipe' && in_array($stream[1], ['r'], true)) {
+					$pipeNumber = $id;
+					break;
+				}
+			}
+			if (!is_int($pipeNumber) || $pipeNumber < 0) {
+				throw new LogicException('No pipe available for reading');
+			}
+		}
+		fclose($this->pipes[$pipeNumber]);
+	}
 	public function receiveOutput($pipeNumber = -1) {
 		if (!is_int($pipeNumber) || $pipeNumber < 0) {
 			foreach($this->descriptor as $id => $stream) {

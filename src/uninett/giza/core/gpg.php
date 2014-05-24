@@ -1,5 +1,6 @@
 <?php namespace uninett\giza\core;
 
+use \DomainException;
 use \FilesystemIterator;
 use \RecursiveIteratorIterator;
 use \RecursiveDirectoryIterator;
@@ -12,9 +13,10 @@ use \RuntimeException;
  */
 class GPG {
 
-	const PROCESS_READS = 1;
-	const PROCESS_WRITES = 2;
-	const PROCESS_ERROR = 4;
+	const PROCESS_READS = 1; // stdin
+	const PROCESS_WRITES = 2; // stdout
+	const PROCESS_ERROR = 4; // stderr
+	const PROCESS_AUX = 8; // auxiliary
 
 	protected $dir;
 	protected $isTemp;
@@ -29,6 +31,9 @@ class GPG {
 		}
 		if ($mask & self::PROCESS_ERROR) {
 			$result[2] = ['pipe', 'w'];
+		}
+		if ($mask & self::PROCESS_AUX) {
+			$result[3] = ['pipe', 'w'];
 		}
 		return $result;
 	}
@@ -46,7 +51,7 @@ class GPG {
 			if (!mkdir($this->dir)) {
 				throw new RuntimeException('GPG homedir does not exist and cannot be created.');
 			}
-			if (chmod($this->dir, 0700)) {
+			if (!chmod($this->dir, 0700)) {
 				throw new RuntimeException('Unable to restrict permissions to GPG homedir.');
 			}
 		} else {
@@ -55,7 +60,7 @@ class GPG {
 		}
 	}
 
-	public function start(array $args, $descriptor = NULL, &$pipes = []) {
+	protected function start(array $args, $descriptor = NULL, &$pipes = []) {
 		if (is_int($descriptor)) {
 			$descriptor = self::getPipeDescriptor($descriptor);
 		} elseif (is_null($descriptor)) {
@@ -82,6 +87,28 @@ class GPG {
 		$result = preg_split("_\\s*\n\\s*_", $process->receiveOutput());
 		$process->close();
 		return $result;
+	}
+
+	public function verifyClear($clearSigned, &$keys) {
+		$keys = [];
+		$process = $this->start(['--no-tty', '--status-fd=3', '--quiet', '--decrypt'], self::PROCESS_READS|self::PROCESS_WRITES|self::PROCESS_ERROR|self::PROCESS_AUX);
+		$process->sendInput($clearSigned);
+		$process->closeInput();
+		$log = preg_split('/\\s+\n\\s+/', $process->receiveOutput(3));
+		$error = $process->receiveOutput(2);
+		foreach(preg_grep('/^\[GNUPG:\] [A-Z]+SIG /', $log) as $line) {
+			$segments = preg_split('/\\s/', $line);
+			if ($segments[1] !== 'VALIDSIG') {
+				throw new DomainException($error);
+			}
+			$keys[] = $segments[2];
+		}
+		if (!$keys) {
+			throw new DomainException($error);
+		}
+		$verified = $process->receiveOutput(1);
+		$process->close();
+		return $verified;
 	}
 
 	public function finalize() {
