@@ -80,4 +80,18 @@ class FileProfileStore implements ProfileStore {
 		return null;
 	}
 
+	public function getNewestProfiles() {
+		$files = glob(
+			rtrim($this->path, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . '*',
+			GLOB_NOSORT|GLOB_NOESCAPE|GLOB_MARK|GLOB_ERR
+		);
+		$pop = function($a){array_pop($a);return $a;};
+		$files = array_map('basename', $files);
+		$files = array_map(function($f){return explode('.',$f);}, $files);
+		$files = array_map($pop, $files);
+		$files = array_map($pop, $files);
+		$files = array_map(function($f){return implode('.',$f);}, $files);
+		return array_map([$this, 'getProfile'], $files);
+	}
+
 }

@@ -4,6 +4,7 @@ use \DomainException;
 use \Serializable;
 
 use \uninett\giza\core\GPG;
+use \uninett\giza\core\PopulatedGPG;
 use \uninett\giza\identity\Profile;
 
 /**
@@ -36,7 +37,7 @@ final class Secret {
 	public function __construct($contents, SecretStore $store = null) {
 		$this->store = $store;
 		$this->rawContents = $contents;
-		$this->gpg = new GPG();
+		$this->gpg = new PopulatedGPG();
 		$this->signedContents = $this->gpg->verifyClear($this->rawContents, $key1);
 		preg_match('_\n-----BEGIN PGP SIGNED MESSAGE-----\n.+_s', $this->signedContents, $matches);
 		$this->rawMetadata = $matches[0];

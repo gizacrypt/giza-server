@@ -17,4 +17,11 @@ interface ProfileStore extends AttributeSource {
 	 */
 	function store(Profile $profile);
 
+	/**
+	 * Get the newest version of all profiles.
+	 *
+	 * @return Profile[] profiles
+	 */
+	function getNewestProfiles();
+
 }

@@ -4,7 +4,12 @@ use \LogicException;
 
 use \uninett\giza\core\Image;
 
-class Profile extends AttributeAssertion {
+/**
+ *
+ * @author Jørn Åne de Jong <jorn.dejong@uninett.no>
+ * @copyright Copyright (c) 2014, UNINETT
+ */
+final class Profile extends AttributeAssertion {
 
 	/**
 	 * @var string
@@ -75,6 +80,11 @@ class Profile extends AttributeAssertion {
 		}
 		return $GLOBALS['gizaConfig']['profileStore']->getProfile($uid);
 	}
+
+	public static function getNewestProfiles() {
+		return $GLOBALS['gizaConfig']['profileStore']->getNewestProfiles();
+	}
+
 	/**
 	 * Store the profile in the profile store.
 	 *
