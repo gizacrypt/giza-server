@@ -166,6 +166,7 @@ final class Secret {
 		        . "\n" . 'Latest: ' . $this->getLatest()->getUUID()
 		        . "\n" . 'Callback: ' . $this->store->getCallbackURL()
 		        . "\n" . '-----END GIZA COMMAND-----'
+		        . "\n"
 		        ;
 		header('Content-Length: ' . strlen($output));
 		ob_clean();
