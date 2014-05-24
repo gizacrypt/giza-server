@@ -214,7 +214,7 @@ final class Secret {
 	 *
 	 * @return int bitmap 
 	 */
-	function getPermissions(Profile $user) {
+	public function getPermissions(Profile $user) {
 		$result = 0;
 		$keys = [];
 		foreach($user->getPGPPublicKeys() as $key) {
