@@ -66,6 +66,10 @@ final class Secret {
 		return $result;
 	}
 
+	public static function getSecret($uuid) {
+		return $GLOBALS['gizaConfig']['secretStore']->getSecret($uuid);
+	}
+
 	protected function getValues($key) {
 		preg_match_all('_^'.$key.':\\s+(.+)$_m', $this->signedMetadata, $matches);
 		$result = [];
