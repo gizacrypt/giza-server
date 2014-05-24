@@ -2,7 +2,7 @@
 
 $gizaConfig = [ 
 
-	'secretStore' => new \uninett\giza\secret\FileSecretSource('/srv/giza'),
+	'secretStore' => new \uninett\giza\secret\FileSecretStore('/srv/giza/secret'),
 
 	'identitySource' => new \uninett\giza\identity\saml\SimpleSamlIdentitySource([
 		'sspRoot' => '/usr/share/simplesamlphp',

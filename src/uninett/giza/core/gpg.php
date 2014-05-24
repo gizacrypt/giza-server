@@ -94,14 +94,15 @@ class GPG {
 		$process = $this->start(['--no-tty', '--status-fd=3', '--quiet', '--decrypt'], self::PROCESS_READS|self::PROCESS_WRITES|self::PROCESS_ERROR|self::PROCESS_AUX);
 		$process->sendInput($clearSigned);
 		$process->closeInput();
-		$log = preg_split('/\\s+\n\\s+/', $process->receiveOutput(3));
+		$log = preg_split('/\\s*\n/', $process->receiveOutput(3));
 		$error = $process->receiveOutput(2);
 		foreach(preg_grep('/^\[GNUPG:\] [A-Z]+SIG /', $log) as $line) {
 			$segments = preg_split('/\\s/', $line);
-			if ($segments[1] !== 'VALIDSIG') {
+			if ($segments[1] === 'GOODSIG') {
+				$keys[] = $segments[2];
+			} elseif (in_array($segments[1], ['BADSIG', 'ERRSIG'])) {
 				throw new DomainException($error);
 			}
-			$keys[] = $segments[2];
 		}
 		if (!$keys) {
 			throw new DomainException($error);
