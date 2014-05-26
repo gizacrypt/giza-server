@@ -11,7 +11,7 @@ class PopulatedGPG extends GPG {
 
 	public function __construct() {
 		parent::__construct();
-		foreach(Profile::getNewestProfiles() as $profile) {
+		foreach(Profile::getActiveProfiles() as $profile) {
 			foreach($profile->getPGPPublicKeys() as $key) {
 				$this->importKey($key);
 			}

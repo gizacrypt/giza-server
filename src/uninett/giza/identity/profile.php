@@ -81,8 +81,8 @@ final class Profile extends AttributeAssertion {
 		return $GLOBALS['gizaConfig']['profileStore']->getProfile($uid);
 	}
 
-	public static function getNewestProfiles() {
-		return $GLOBALS['gizaConfig']['profileStore']->getNewestProfiles();
+	public static function getActiveProfiles() {
+		return $GLOBALS['gizaConfig']['profileStore']->getActiveProfiles();
 	}
 
 	/**

@@ -76,7 +76,7 @@ class FileProfileStore implements ProfileStore {
 		return $profile;
 	}
 
-	public function getNewestProfiles() {
+	public function getActiveProfiles() {
 		$files = glob(
 			rtrim($this->path, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . '*',
 			GLOB_NOSORT|GLOB_NOESCAPE|GLOB_MARK|GLOB_ERR

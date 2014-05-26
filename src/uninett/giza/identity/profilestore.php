@@ -22,6 +22,6 @@ interface ProfileStore extends AttributeSource {
 	 *
 	 * @return Profile[] profiles
 	 */
-	function getNewestProfiles();
+	function getActiveProfiles();
 
 }
