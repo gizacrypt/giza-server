@@ -70,6 +70,19 @@ final class Secret {
 		return $GLOBALS['gizaConfig']['secretStore']->getSecret($uuid);
 	}
 
+	/**
+	 * Get the URL that the shell script should use to send updated secrets.
+	 *
+	 * @return string the URL
+	 */
+	public static function getCallbackURL() {
+		return (empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == 'off' ? 'http' : 'https')
+			. '://'
+			. $_SERVER['HTTP_HOST']
+			. dirname($_SERVER['PHP_SELF'])
+			;
+	}
+
 	protected function getValues($key) {
 		preg_match_all('_^'.$key.':\\s+(.+)$_m', $this->signedMetadata, $matches);
 		$result = [];
@@ -164,7 +177,7 @@ final class Secret {
 		        . "\n" . '-----BEGIN GIZA COMMAND-----'
 		        . "\n" . 'Action: ' . $action
 		        . "\n" . 'Latest: ' . $this->getLatest()->getUUID()
-		        . "\n" . 'Callback: ' . $this->store->getCallbackURL()
+		        . "\n" . 'Callback: ' . static::getCallbackURL()
 		        . "\n" . '-----END GIZA COMMAND-----'
 		        . "\n"
 		        ;

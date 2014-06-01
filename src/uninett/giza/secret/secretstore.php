@@ -58,10 +58,7 @@ interface SecretStore {
 	function newSecret($contents);
 
 	/**
-	 * Get the URL that the shell script should use to send updated secrets.
 	 *
-	 * @return string the URL
 	 */
-	function getCallbackURL();
 
 }

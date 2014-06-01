@@ -110,12 +110,4 @@ class FileSecretStore implements SecretStore {
 		}
 	}
 
-	public function getCallbackURL() {
-		return (empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == 'off' ? 'http' : 'https')
-			. '://'
-			. $_SERVER['HTTP_HOST']
-			. $_SERVER['PHP_SELF']
-			;
-	}
-
 }
