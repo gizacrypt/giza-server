@@ -49,6 +49,15 @@ interface SecretStore {
 	function getNewestSecrets();
 
 	/**
+	 * Get all secrets, also the older revisions
+	 *
+	 * @param Profile $profile
+	 *
+	 * @return Secret[]
+	 */
+	function getAllSecrets();
+
+	/**
 	 * Validates and updates the Giza file.
 	 *
 	 * @param string $newFile
@@ -56,9 +65,5 @@ interface SecretStore {
 	 * @return void
 	 */
 	function newSecret($contents);
-
-	/**
-	 *
-	 */
 
 }

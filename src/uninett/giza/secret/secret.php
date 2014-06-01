@@ -111,6 +111,17 @@ final class Secret {
 		$this->store->getNextSecret($this);
 	}
 
+	public function getNextUUID() {
+		$next = $this->getNext();
+		if ($next) {
+			return $next->getUUID();
+		}
+	}
+
+	public function hasNext() {
+		return !is_null($this->getNext());
+	}
+
 	/**
 	 * Get the secret that was the most recent one before this secret was created
 	 *
@@ -166,7 +177,7 @@ final class Secret {
 	 *
 	 * @return void
 	 */
-	public function action($action) {
+	public function action($action, Profile $profile) {
 		header('Content-Description: File Transfer');
 		header('Content-Type: application/x-giza');
 		header('Content-Disposition: attachment; filename='.$this->getUUID().'.giza');
@@ -176,7 +187,10 @@ final class Secret {
 		$output = trim($this->rawContents)
 		        . "\n" . '-----BEGIN GIZA COMMAND-----'
 		        . "\n" . 'Action: ' . $action
-		        . "\n" . 'Latest: ' . $this->getLatest()->getUUID()
+		        . (is_null($this->getNext())
+		        	? ''
+		        	: "\n" . 'Latest: ' . $this->getLatest()->getUUID()
+		        	)
 		        . "\n" . 'Callback: ' . static::getCallbackURL()
 		        . "\n" . '-----END GIZA COMMAND-----'
 		        . "\n"

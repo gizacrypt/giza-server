@@ -38,12 +38,21 @@ class FileSecretStore implements SecretStore {
 		return new Secret(file_get_contents($this->getPathForSecret($uuid)), $this);
 	}
 
+	public function getNextSecretUUID($secret) {
+		$next = $this->getNextSecret($secret);
+		if ($next) {
+			return $next->getUUID();
+		}
+	}
+
 	public function getNextSecret($secret) {
 		if ($secret instanceof Secret) {
 			return $this->getNextSecret($secret->getUUID());
 		} elseif (is_string($secret)) {
-			if (is_link($this->getPathForSecret($secret).'.next')) {
-				$this->getSecret(readlink($this->getPathForSecret($secret).'.next'));
+			foreach($this->getAllSecrets() as $candidate) {
+				if ($candidate->getPreviousUUID() === $secret) {
+					return $candidate;
+				}
 			}
 		} else {
 			throw new InvalidArgumentException('Secret must be object or UUID string.');
@@ -61,8 +70,7 @@ class FileSecretStore implements SecretStore {
 		}
 	}
 
-	public function getNewestSecrets() {
-		$result = [];
+	public function getAllSecrets() {
 		$paths = glob(
 			$this->path . DIRECTORY_SEPARATOR . '????????-????-????-????-????????????',
 			GLOB_NOSORT|GLOB_NOESCAPE|GLOB_MARK|GLOB_ERR
@@ -70,9 +78,14 @@ class FileSecretStore implements SecretStore {
 		if (!is_array($paths)) {
 			throw new DomainException('Cannot read directory '.$this->path);
 		}
-		foreach($paths as $path) {
-			if (!file_exists($path . '.next')) {
-				$result[] = $this->getSecret(basename($path));
+		return array_map([$this, 'getSecret'], array_map('basename', $paths));
+	}
+
+	public function getNewestSecrets() {
+		$result = [];
+		foreach($this->getAllSecrets() as $secret) {
+			if (!$secret->hasNext()) {
+				$result[] = $secret;
 			}
 		}
 		return $result;
@@ -102,9 +115,7 @@ class FileSecretStore implements SecretStore {
 			}
 			// TODO Check authority
 			// TODO Check basis and previous have common ancestor
-			if (file_put_contents(getPathForSecret($secret), $contents)) {
-				symlink($secret->getUUID, getPathForSecret($previous).'.next');
-			} else {
+			if (!file_put_contents(getPathForSecret($secret), $contents)) {
 				throw new RuntimeException('Unable to write secret '.$secret->getUUID());
 			}
 		}
