@@ -23,7 +23,6 @@ final class Secret {
 
 	protected $store;
 	protected $uuid;
-	protected $gpg;
 	protected $nextUUID;
 
 	protected $rawContents;
@@ -38,14 +37,14 @@ final class Secret {
 	public function __construct($contents, SecretStore $store = null) {
 		$this->store = $store;
 		$this->rawContents = $contents;
-		$this->gpg = new PopulatedGPG();
-		$this->signedContents = $this->gpg->verifyClear($this->rawContents, $key1);
+		$gpg = new PopulatedGPG();
+		$this->signedContents = $gpg->verifyClear($this->rawContents, $key1);
 		preg_match('_\n-----BEGIN PGP SIGNED MESSAGE-----\n.+_s', $this->signedContents, $matches);
 		$this->rawMetadata = $matches[0];
 		if (!$this->rawMetadata) {
 			throw new DomainException('No signed metadata found');
 		}
-		$this->signedMetadata = $this->gpg->verifyClear($this->rawMetadata, $key2);
+		$this->signedMetadata = $gpg->verifyClear($this->rawMetadata, $key2);
 		if ($key1 != $key2) {
 			throw new DomainException('Inner and outer signatures must be made with the same key.');
 		}
