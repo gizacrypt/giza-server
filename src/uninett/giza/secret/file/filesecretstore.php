@@ -91,33 +91,13 @@ class FileSecretStore implements SecretStore {
 		return $result;
 	}
 
-	public function newSecret($contents) {
+	public function addValidSecret(Secret $secret) {
 		$secret = new Secret($contents);
 		if (file_exists($this->getPathForSecret($secret->getUUID()))) {
 			throw new DomainException('A secret with UUID '.$secret->getUUID().' already exists.');
 		}
-		if (is_null($secret->getPreviousUUID()) && is_null($secret->getBasisUUID())) {
-			if (!file_put_contents(getPathForSecret($secret), $contents)) {
-				throw new RuntimeException('Unable to write secret '.$secret->getUUID());
-			}
-		} else {
-			$previous = $this->getSecret($secret->getPreviousUUID());
-			if (!is_null($previous->getNext())) {
-				throw new DomainException(
-						  'The new secret '
-						. $secret->getUUID()
-						. ' lists '
-						. $previous->getUUID()
-						. ' as it predecessor, but '
-						. $previos->getLatest()->getUUID()
-						. ' is the current revision.'
-					);
-			}
-			// TODO Check authority
-			// TODO Check basis and previous have common ancestor
-			if (!file_put_contents(getPathForSecret($secret), $contents)) {
-				throw new RuntimeException('Unable to write secret '.$secret->getUUID());
-			}
+		if (!file_put_contents($this->getPathForSecret($secret), $contents)) {
+			throw new RuntimeException('Unable to write secret '.$secret->getUUID());
 		}
 	}
 

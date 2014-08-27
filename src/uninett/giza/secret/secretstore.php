@@ -3,7 +3,7 @@
 use \Serializable;
 
 /**
- * Giza API for secrets.  A Giza secret is a GPG encrypted file,
+ * Giza storage API for secrets.  A Giza secret is a GPG encrypted file,
  * with additional signed metadata.
  *
  * @author Jørn Åne de Jong <jorn.dejong@uninett.no>
@@ -58,12 +58,12 @@ interface SecretStore {
 	function getAllSecrets();
 
 	/**
-	 * Validates and updates the Giza file.
+	 * Add a new secret which has been validated.
 	 *
-	 * @param string $newFile
+	 * @param Secret $secret the secret
 	 *
 	 * @return void
 	 */
-	function newSecret($contents);
+	function addValidSecret(Secret $secret);
 
 }
