@@ -53,6 +53,7 @@ final class Profile extends AttributeAssertion {
 		$identities = AttributeAssertion::collect(null);
 		return new Profile($identities);
 	}
+
 	/**
 	 * Create a profile from a given UID
 	 *
@@ -64,6 +65,7 @@ final class Profile extends AttributeAssertion {
 		$identities = AttributeAssertion::collect($uid);
 		return new Profile($identities);
 	}
+
 	/**
 	 * Load profile from the profile store.
 	 * This method will return NULL if the profile was not stored before
