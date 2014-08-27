@@ -4,6 +4,7 @@ use \DomainException;
 use \LogicException;
 use \Serializable;
 
+use \uninett\giza\Giza;
 use \uninett\giza\core\Image;
 use \uninett\giza\core\LDIFSerializable;
 use \uninett\giza\core\NoImage;
@@ -39,13 +40,13 @@ class AttributeAssertion extends LDIFSerializable {
 	public static function collect($uid = null) {
 		$assertions = [];
 		if (is_null($uid)) {
-			$identityAssertion = $GLOBALS['gizaConfig']['authenticationSource']->getAuthenticationAssertion();
+			$identityAssertion = Giza::getInstance()->getIdentitySource()->getAuthenticationAssertion();
 			$uid = $identityAssertion->getUniqueId();
 			if (!$uid || !$identityAssertion) {
 				return [];
 			}
 		}
-		foreach($GLOBALS['gizaConfig']['auxiliaryAttributeSources'] as $name => $source) {
+		foreach(Giza::getInstance()->getAuxiliaryIdentitySources() as $name => $source) {
 			$assertion = $source->getAssertionFor([$identityAssertion]);
 			if (isset($assertion)) {
 				$testUid = $assertion->getUniqueId();

@@ -2,6 +2,7 @@
 
 use \LogicException;
 
+use \uninett\giza\Giza;
 use \uninett\giza\core\Image;
 
 /**
@@ -33,6 +34,15 @@ final class Profile extends AttributeAssertion {
 	protected $attributeAssertions;
 
 	protected $singleValueAttributes = ['uid', 'displayName', 'mail', 'photo'];
+
+	/**
+	 * Get the configured profile store
+	 *
+	 * @return ProfileStore
+	 */
+	protected static function getStore() {
+		return Giza::getInstance()->getIdentityStore();
+	}
 
 	/**
 	 * Create a profile from the authenticated identity
@@ -78,11 +88,11 @@ final class Profile extends AttributeAssertion {
 			}
 			$uid = $profile->getUniqueId();
 		}
-		return $GLOBALS['gizaConfig']['profileStore']->getProfile($uid);
+		return static::getStore()->getProfile($uid);
 	}
 
 	public static function getActiveProfiles() {
-		return $GLOBALS['gizaConfig']['profileStore']->getActiveProfiles();
+		return static::getStore()->getActiveProfiles();
 	}
 
 	/**
@@ -91,7 +101,7 @@ final class Profile extends AttributeAssertion {
 	 * This is a convenience function that calls the ProfileStore#store() method.
 	 */
 	public function store() {
-		$GLOBALS['gizaConfig']['profileStore']->store($this);
+		Giza::getInstance()->getIdentityStore()->store($this);
 	}
 
 	/**

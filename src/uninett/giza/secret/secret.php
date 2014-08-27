@@ -3,6 +3,7 @@
 use \DomainException;
 use \Serializable;
 
+use \uninett\giza\Giza;
 use \uninett\giza\core\GPG;
 use \uninett\giza\core\PopulatedGPG;
 use \uninett\giza\identity\Profile;
@@ -58,8 +59,8 @@ final class Secret {
 			throw new DomainException('No profile provided and none available from session.');
 		}
 		$result = [];
-		foreach($GLOBALS['gizaConfig']['secretStore']->getNewestSecrets() as $secret) {
-			if ($secret->getPermissions($profile)) {
+		foreach(Giza::getInstance()->getSecretStore()->getNewestSecrets() as $secret) {
+			if (($secret->getPermissions($profile) & $mask) > 0) {
 				$result[] = $secret;
 			}
 		}
@@ -67,7 +68,7 @@ final class Secret {
 	}
 
 	public static function getSecret($uuid) {
-		return $GLOBALS['gizaConfig']['secretStore']->getSecret($uuid);
+		return Giza::getInstance()->getSecretStore()->getSecret($uuid);
 	}
 
 	/**
@@ -136,7 +137,7 @@ final class Secret {
 	}
 
 	public function getPrevious() {
-		return $this->store->getSecret($this->getPreviousUUID());
+		return static::getSecret($this->getPreviousUUID());
 	}
 
 	/**
@@ -153,7 +154,7 @@ final class Secret {
 	}
 
 	public function getBasedOn() {
-		return $this->store->getSecret($this->getBasedOnUUID);
+		return static::getSecret($this->getBasedOnUUID);
 	}
 
 	/**

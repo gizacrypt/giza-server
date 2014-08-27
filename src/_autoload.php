@@ -9,5 +9,3 @@
 spl_autoload_extensions('.php');
 spl_autoload_register();
 set_include_path(get_include_path().PATH_SEPARATOR.__DIR__);
-
-require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'etc' . DIRECTORY_SEPARATOR . 'gizaconfig.php';

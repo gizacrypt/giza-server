@@ -1,5 +1,7 @@
 <?php namespace uninett\giza\core;
 
+use \uninett\giza\Giza;
+
 /**
  *
  * @author Jørn Åne de Jong <jorn.dejong@uninett.no>
@@ -8,7 +10,7 @@
 class NoImage extends ImageFile {
 
 	public function __construct() {
-		parent::__construct($GLOBALS['gizaConfig']['standardImage']);
+		parent::__construct(Giza::getInstance()->getStandardIdentityImage());
 	}
 
 	public final function viewImage() {

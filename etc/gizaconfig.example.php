@@ -1,6 +1,6 @@
 <?php
 
-$gizaConfig = [ 
+return [ 
 
 	'secretStore' => new \uninett\giza\secret\FileSecretStore('/srv/giza/secret'),
 
@@ -22,8 +22,8 @@ $gizaConfig = [
 		new PDO('pgsql:dbname=giza;host=127.0.0.1;sslmode=require', 'username', 'password')
 	),
 
-	'gpgBinary' => '/usr/bin/gpg',
+	'gpgBinaryPath' => '/usr/bin/gpg',
 	
-	'standardImage' => './www/static/sfx/no-photo.svg',
+	'standardIdentityImage' => './www/static/sfx/no-photo.svg',
 
 ];

@@ -6,6 +6,8 @@ use \RecursiveIteratorIterator;
 use \RecursiveDirectoryIterator;
 use \RuntimeException;
 
+use \uninett\giza\Giza;
+
 /**
  *
  * @author Jørn Åne de Jong <jorn.dejong@uninett.no>
@@ -70,7 +72,7 @@ class GPG {
 		$args[] = $this->dir;
 		$args = ' '.implode(' ', array_map('escapeshellarg', $args));
 		$process = proc_open(
-			escapeshellcmd($GLOBALS['gizaConfig']['gpgBinary']).$args,
+			escapeshellcmd(Giza::getInstance()->getGpgBinaryPath() . $args),
 			$descriptor, $pipes, $this->dir
 		);
 		return new Process($process, $descriptor, $pipes);
