@@ -84,6 +84,13 @@ class GPG {
 		$process->close();
 	}
 
+	public function exportKey($name) {
+		$process = $this->start(['--armour', '--export'], self::PROCESS_WRITES);
+		$result = $process->receiveOutput();
+		$process->close();
+		return new PGPPublicKey($result);
+	}
+
 	public function listSigs() {
 		$process = $this->start(['--list-sigs', '--with-colons'], self::PROCESS_WRITES);
 		$result = preg_split("_\\s*\n\\s*_", $process->receiveOutput());

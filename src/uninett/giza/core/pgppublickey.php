@@ -23,6 +23,20 @@ class PGPPublicKey implements Serializable {
 		$this->pgpKey = trim($pgpKey);
 	}
 
+	/**
+	 * Get the public key that corresponds to the give key ID.
+	 * This Key ID must be available in the populated keychain,
+	 * which means that there must exist a user with this key ID.
+	 *
+	 * @param string $keyId the key ID
+	 *
+	 * @return PGPPublicKey the public key
+	 */
+	public static function fromKeyId($keyId) {
+		$gpg = new PopulatedGPG();
+		return $gpg->exportKey($keyId);
+	}
+
 	public function getKey() {
 		return $this->pgpKey;
 	}

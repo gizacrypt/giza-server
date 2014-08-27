@@ -4,6 +4,7 @@ use \LogicException;
 
 use \uninett\giza\Giza;
 use \uninett\giza\core\Image;
+use \uninett\giza\core\PGPPublicKey;
 
 /**
  *
@@ -95,6 +96,22 @@ final class Profile extends AttributeAssertion {
 
 	public static function getActiveProfiles() {
 		return static::getStore()->getActiveProfiles();
+	}
+
+	/**
+	 * @return Profile
+	 *
+	 * @throws DomainException if a public key is shared among profiles
+	 */
+	public static function getActiveFromKey(PGPPublicKey $key) {
+		$keyId = $key->getKeyId();
+		foreach(static::getActiveProfiles() as $profile) {
+			foreach($profile->getPGPPublicKeys() as $profileKey) {
+				if ($profileKey->getKeyId() === $keyId) {
+					return $profile;
+				}
+			}
+		}
 	}
 
 	/**
