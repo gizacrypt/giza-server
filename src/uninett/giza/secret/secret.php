@@ -182,9 +182,7 @@ final class Secret {
 		header('Content-Description: File Transfer');
 		header('Content-Type: application/x-giza');
 		header('Content-Disposition: attachment; filename='.$this->getUUID().'.giza');
-		header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
 		header('Cache-Control: no-cache');
-		header('Pragma: no-cache');
 		$output = trim($this->rawContents)
 		        . "\n" . '-----BEGIN GIZA COMMAND-----'
 		        . "\n" . 'Action: ' . $action
