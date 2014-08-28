@@ -22,7 +22,7 @@ class ImageFile extends Image {
 
 	public function viewImage() {
 		header('Content-type: '.$this->getImageContentType());
-		readfile($file);
+		readfile($this->file);
 	}
 	public function getImageBytes() {
 		return file_get_contents($this->getImageFile());
