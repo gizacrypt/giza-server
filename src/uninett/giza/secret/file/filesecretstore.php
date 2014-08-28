@@ -28,10 +28,10 @@ class FileSecretStore implements SecretStore {
 	public function getPathForSecret($secret) {
 		if ($secret instanceof Secret) {
 			return $this->getPathForSecret($secret->getUUID());
-		} elseif (!is_string($secret)) {
-			throw new InvalidArgumentException('Secret must be object or UUID string.');
+		} elseif (is_string($secret)) {
+			return $this->getPath() . DIRECTORY_SEPARATOR . $secret;
 		}
-		return $this->getPath() . DIRECTORY_SEPARATOR . $secret;
+		throw new InvalidArgumentException('Secret must be object or UUID string.');
 	}
 
 	public function getSecret($uuid) {
