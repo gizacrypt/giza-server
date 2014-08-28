@@ -62,12 +62,19 @@ class FileSecretStore implements SecretStore {
 
 	public function getName($secret) {
 		if ($secret instanceof Secret) {
-			return $secret->getUUID();
+			$uuid = $secret->getUUID();
+			while(!is_null($secret)) {
+				$path = $this->getPathForSecret($path).'.name';
+				if (is_file($path)) {
+					return file_get_contents($path);
+				}
+				$secret = $secret->getBasedOn();
+			}
+			return $uuid;
 		} elseif (is_string($secret)) {
-			return $secret;
-		} else {
-			throw new InvalidArgumentException('Secret must be object or UUID string.');
+			return $this->getName($this->getSecret($secret));
 		}
+		throw new InvalidArgumentException('Secret must be object or UUID string.');
 	}
 
 	public function getAllSecrets() {
