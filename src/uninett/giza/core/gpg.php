@@ -85,7 +85,7 @@ class GPG {
 	}
 
 	public function exportKey($name) {
-		$process = $this->start(['--armour', '--export'], self::PROCESS_WRITES);
+		$process = $this->start(['--armour', '--export', $name], self::PROCESS_WRITES);
 		$result = $process->receiveOutput();
 		$process->close();
 		return new PGPPublicKey($result);
