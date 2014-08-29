@@ -1,5 +1,7 @@
 <?php namespace uninett\giza;
 
+use \DomainException;
+
 /**
  * Giza application class.
  * It will read the configfile on construction
@@ -9,21 +11,32 @@ class Giza {
 
 	private static $instance;
 	
+	public static function setInstance($config = null) {
+		static::$instance = new Giza($config);
+	}
+
 	public static function getInstance() {
 		if ( is_null( static::$instance ) ) {
-			static::$instance = new Giza;
+			static::setInstance();
 		}
 		return static::$instance;
 	}
 
 	protected $config;
 
-	public function __construct($configfile = NULL) {
-		if (isset($configfile)) {
-			$this->config = $configfile;
-		} else {
+	/**
+	 * Construct a new Giza application class
+	 */
+	public function __construct($config = null) {
+		if (is_object($config) || is_array($config)) {
+			$this->config = (object)$config;
+		} elseif (is_string($config)) {
+			$this->config = $config;
+		} elseif (is_null($config)) {
 			$this->config = require dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR
 				. 'etc' . DIRECTORY_SEPARATOR . 'giza.conf.php';
+		} else {
+			throw new DomainException('Config must be object, array, string or null but it is a '.gettype($config));
 		}
 	}
 
