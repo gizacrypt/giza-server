@@ -14,8 +14,6 @@ abstract class LDIFSerializable implements Serializable {
 
 	abstract protected function setAttributes($attributes);
 
-	protected $singleValueAttributes = ['uid'];
-
 	public function serialize() {
 		$result = '';
 		$elements = $this->getAttributes();
@@ -55,10 +53,6 @@ abstract class LDIFSerializable implements Serializable {
 		$attributeValue = '';
 		$b64Encoded = false;
 		$result = [];
-		$rejectAttributes = [];
-		foreach($this->singleValueAttributes as $attributeName) {
-			$rejectAttributes[$attributeName] = false;
-		}
 		foreach($lines as $lineNr => $line) {
 			if (strlen($line) && trim($line) && $line{0} === ' ') {
 				$attributeValue .= substr($line, 1);
@@ -74,12 +68,6 @@ abstract class LDIFSerializable implements Serializable {
 					$attributeName = $matches[1];
 					$attributeValue = $matches[3];
 					$b64Encoded = strlen($matches[2]) > 1;
-					if (isset($rejectAttributes[$attributeName])) {
-						if ($rejectAttributes[$attributeName]) {
-							throw new LogicException('LDIF contains duplicate attribute '.$attributeName.' on line '.$lineNr);
-						}
-						$rejectAttributes[$attributeName] = true;
-					}
 				} elseif (!trim($line)) {
 					$attributeName = NULL;
 					$attributeValue = NULL;
