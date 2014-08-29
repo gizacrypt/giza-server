@@ -21,15 +21,6 @@ final class Secret {
 	const ACCESS_WRITE = 2;
 	const ACCESS_ADMIN = 1;
 
-	protected $store;
-	protected $uuid;
-	protected $nextUUID;
-
-	protected $rawContents;
-	protected $signedContents;
-	protected $rawMetadata;
-	protected $signedMetadata;
-
 	/**
 	 * @var string $contents contents of the secret
 	 * @var SecretStore $store store of the secret
@@ -50,6 +41,12 @@ final class Secret {
 		}
 	}
 
+	/**
+	 * Get all secrets that are accessible from either the current or a given profile.
+	 *
+	 * @param Profile $profile The profile to check
+	 * @param int $mask Bit map of all qualifying access bits
+	 */
 	public static function getSecretsForProfile(Profile $profile = null) {
 		if (is_null($profile)) {
 			$profile = Profile::fromStore();
@@ -66,6 +63,12 @@ final class Secret {
 		return $result;
 	}
 
+	/**
+	 * Shorthand for <code>Giza::getInstance()->getSecretStore()->getSecret($uuid)</code>
+	 *
+	 * @return Secret secret with the requested UUID
+	 * @throws RuntimeException if a secret with the requested UUID does not exist
+	 */
 	public static function getSecret($uuid) {
 		return Giza::getInstance()->getSecretStore()->getSecret($uuid);
 	}
@@ -83,6 +86,47 @@ final class Secret {
 			;
 	}
 
+	/**
+	 * @var SecretStore the secret store where this secret is stored
+	 */
+	protected $store;
+
+	/**
+	 * @var string UUID of this secret
+	 */
+	protected $uuid;
+
+	/**
+	 * @var string UUID of the secret that replaces this secret, or null
+	 */
+	protected $nextUUID;
+
+	/**
+	 * @var string the raw contents of this secret
+	 */
+	protected $rawContents;
+
+	/**
+	 * @var string the raw contents of this secret, as stored in the file storage
+	 */
+	protected $signedContents;
+
+	/**
+	 * @var string the metadata of this secret, in PGP clearsigned container
+	 */
+	protected $rawMetadata;
+
+	/**
+	 * @var string the metadata of this secret, without the PGP clearsigned container
+	 */
+	protected $signedMetadata;
+
+	 * Get all values for a given key from the secret's metadata
+	 *
+	 * @param string $key key whose values are to be returned
+	 *
+	 * @return string[] all values found, empty array if none found
+	 */
 	protected function getValues($key) {
 		preg_match_all('_^'.$key.':\\s+(.+)$_m', $this->signedMetadata, $matches);
 		$result = [];
@@ -92,6 +136,14 @@ final class Secret {
 		return $result;
 	}
 
+	/**
+	 * Get the UUID of this secret.
+	 *
+	 * The UUID is used as a unique persistent identifier of a secret.
+	 * The UUID is public information and used as the filename of a secret.
+	 *
+	 * @return string the UUID of this secret
+	 */
 	public function getUUID() {
 		if (is_null($this->uuid)) {
 			$this->uuid = reset($this->getValues('Revision'));
@@ -104,13 +156,20 @@ final class Secret {
 
 	/**
 	 * Get the secret that replaced this secret.
+	 * Return <code>null</code> if this secret has no newer version.
 	 *
-	 * @return Secret
+	 * @return Secret secret that replaces this secret
 	 */
 	public function getNext() {
 		$this->store->getNextSecret($this);
 	}
 
+	/**
+	 * Get the UUID of the secret that replaced this secret.
+	 * Return <code>null</code> if this secret has no newer version.
+	 *
+	 * @return string UUID of the secret
+	 */
 	public function getNextUUID() {
 		$next = $this->getNext();
 		if ($next) {
@@ -118,14 +177,19 @@ final class Secret {
 		}
 	}
 
+	/**
+	 * Returns whether this secret has a newer version.
+	 *
+	 * @return boolean this secret has a newer version
+	 */
 	public function hasNext() {
 		return !is_null($this->getNext());
 	}
 
 	/**
-	 * Get the secret that was the most recent one before this secret was created
+	 * Get the UUID of secret that was the most recent one before this secret was created.
 	 *
-	 * @return Secret
+	 * @return string the UUID of the previous secret
 	 */
 	public function getPreviousUUID() {
 		$uuid = reset($this->getValues('Previous'));
@@ -135,14 +199,19 @@ final class Secret {
 		return $uuid;
 	}
 
+	/**
+	 * Get the secret that was the most recent one before this secret was created
+	 *
+	 * @return Secret previous secret
+	 */
 	public function getPrevious() {
 		return static::getSecret($this->getPreviousUUID());
 	}
 
 	/**
-	 * Get the secret this secret was based on.
+	 * Get the UUID of the secret that this secret was based on.
 	 *
-	 * @return Secret
+	 * @return string UUID of the secret this secret was based on
 	 */
 	public function getBasedOnUUID() {
 		$uuid = reset($this->getValues('Basis'));
@@ -152,12 +221,19 @@ final class Secret {
 		return $uuid;
 	}
 
+	/**
+	 * Get the secret that this secret was based on.
+	 *
+	 * @return Secret secret this secret was based on
+	 */
 	public function getBasedOn() {
 		return static::getSecret($this->getBasedOnUUID);
 	}
 
 	/**
-	 * @return Secret the newest update of this secret.
+	 * Get the latest version of this secret
+	 *
+	 * @return Secret the latest version of this secret.
 	 */
 	public function getLatest() {
 		$current = $this;
@@ -171,11 +247,12 @@ final class Secret {
 	}
 
 	/**
-	 * Generate a Giza file with this action.
+	 * Generate a Giza file with an action
 	 *
-	 * @param string $action
+	 * @param string[string] $parameters parameters for how the file must be generated
+	 * @param Profile $profile the identity that requested the action, null to use current
 	 *
-	 * @return void
+	 * @return void, headers and a Content-Length header are sent, so no more output is accepted
 	 */
 	public function action($action, Profile $profile) {
 		header('Content-Description: File Transfer');
@@ -201,14 +278,18 @@ final class Secret {
 	}
 
 	/**
-	 * Get the name of this version of the secret.
+	 * Get the name of this secret.
+	 *
+	 * @return string name of this secret
 	 */
 	public function getName() {
 		return $this->store->getName($this);
 	}
 
 	/**
-	 * @return DateTime
+	 * Get the creation time of this secret
+	 *
+	 * @return DateTime creation time of this secret
 	 */
 	public function getTimestamp() {
 		$timestamp = DateTime::createFromFormat(DATE_W3C, reset($this->getValues('Date')));
@@ -227,18 +308,20 @@ final class Secret {
 	}
 
 	/**
-	 * Get the content type of this version of the secret.
+	 * Get the content type of this secret.
 	 *
-	 * @return string
+	 * @return string content type of this secret
 	 */
 	public function getContentType() {
 		return reset($this->getValues('Content-Type'));
 	}
 
 	/**
-	 * Return the permissions for this secret.
+	 * Return the permissions that a profile has for this secret.
 	 *
-	 * @return int bitmap 
+	 * @param Profile $profile The profile
+	 *
+	 * @return int Permissions bitmask
 	 */
 	public function getPermissions(Profile $user) {
 		$result = 0;
