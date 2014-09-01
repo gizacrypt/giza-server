@@ -10,7 +10,7 @@ $saml = new \uninett\giza\identity\saml\SimpleSamlAttributeSource([
 ]);
 return [
 
-	'secretStore' => new \uninett\giza\secret\file\FileSecretStore('/srv/giza/secret'),
+	'secretStore' => new \uninett\giza\secret\storage\file\FileSecretStore('/srv/giza/secret'),
 
 	'identitySource' => $saml,
 
