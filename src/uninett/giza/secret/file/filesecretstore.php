@@ -50,7 +50,7 @@ class FileSecretStore implements SecretStore {
 			return $this->getNextSecret($secret->getUUID());
 		} elseif (is_string($secret)) {
 			foreach($this->getAllSecrets() as $candidate) {
-				if ($candidate->getPreviousUUID() === $secret) {
+				if ($candidate->getMetadata()->getPrevious() === $secret) {
 					return $candidate;
 				}
 			}

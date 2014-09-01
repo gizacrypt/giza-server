@@ -135,9 +135,9 @@ final class Secret {
 	protected $rawMetadata;
 
 	/**
-	 * @var string the metadata of this secret, without the PGP clearsigned container
+	 * @var Metadata parsed metadata object
 	 */
-	protected $signedMetadata;
+	protected $metadata;
 
 	/**
 	 * @param string $contents contents of the secret
@@ -155,27 +155,11 @@ final class Secret {
 		if (!$this->rawMetadata) {
 			throw new DomainException('No signed metadata found');
 		}
-		$this->signedMetadata = $gpg->verifyClear($this->rawMetadata, $key2);
+		$this->metadata = new Metadata($gpg->verifyClear($this->rawMetadata, $key2));
 		if ($key1 != $key2) {
 			throw new DomainException('Inner and outer signatures must be made with the same key.');
 		}
 		$this->key = PGPPublicKey::fromKeyId($key1);
-	}
-
-	/**
-	 * Get all values for a given key from the secret's metadata
-	 *
-	 * @param string $key key whose values are to be returned
-	 *
-	 * @return string[] all values found, empty array if none found
-	 */
-	protected function getValues($key) {
-		preg_match_all('_^'.$key.':\\s+(.+)$_m', $this->signedMetadata, $matches);
-		$result = [];
-		foreach(reset($matches) as $match) {
-			$result[] = trim(substr($match, strlen($key)+1));
-		}
-		return $result;
 	}
 
 	/**
@@ -215,13 +199,16 @@ final class Secret {
 	 * @return string the UUID of this secret
 	 */
 	public function getUUID() {
-		if (is_null($this->uuid)) {
-			$this->uuid = reset($this->getValues('Revision'));
-		}
-		if (!$this->uuid) {
-			throw new DomainException('Secret has no UUID');
-		}
-		return $this->uuid;
+		return $this->metadata->getUUID();
+	}
+
+	/**
+	 * Get the metadata associated with this secret
+	 *
+	 * @return Metadata metadata associated with this secret
+	 */
+	public function getMetadata() {
+		return $this->metadata;
 	}
 
 	/**
@@ -235,19 +222,6 @@ final class Secret {
 	}
 
 	/**
-	 * Get the UUID of the secret that replaced this secret.
-	 * Return <code>null</code> if this secret has no newer version.
-	 *
-	 * @return string UUID of the secret
-	 */
-	public function getNextUUID() {
-		$next = $this->getNext();
-		if ($next) {
-			return $next->getUUID();
-		}
-	}
-
-	/**
 	 * Returns whether this secret has a newer version.
 	 *
 	 * @return boolean this secret has a newer version
@@ -257,38 +231,12 @@ final class Secret {
 	}
 
 	/**
-	 * Get the UUID of secret that was the most recent one before this secret was created.
-	 *
-	 * @return string the UUID of the previous secret
-	 */
-	public function getPreviousUUID() {
-		$uuid = reset($this->getValues('Previous'));
-		if ($uuid === FALSE) {
-			return null;
-		}
-		return $uuid;
-	}
-
-	/**
 	 * Get the secret that was the most recent one before this secret was created
 	 *
 	 * @return Secret previous secret
 	 */
 	public function getPrevious() {
-		return static::getSecret($this->getPreviousUUID());
-	}
-
-	/**
-	 * Get the UUID of the secret that this secret was based on.
-	 *
-	 * @return string UUID of the secret this secret was based on
-	 */
-	public function getBasedOnUUID() {
-		$uuid = reset($this->getValues('Basis'));
-		if ($uuid === FALSE) {
-			return null;
-		}
-		return $uuid;
+		return static::getSecret($this->metadata->getPrevious());
 	}
 
 	/**
@@ -297,7 +245,7 @@ final class Secret {
 	 * @return Secret secret this secret was based on
 	 */
 	public function getBasedOn() {
-		return static::getSecret($this->getBasedOnUUID);
+		return static::getSecret($this->metadata->getBasedOn());
 	}
 
 	/**
@@ -399,7 +347,7 @@ final class Secret {
 		foreach($user->getPGPPublicKeys() as $key) {
 			$keyIDs[] = $key->getKeyID();
 		}
-		foreach($this->getMetadataValues('Access') as $line) {
+		foreach($this->metadata->getAccess() as $line) {
 			$segments = preg_split('/\\s+/', $line, 3);
 			if (in_array($segments[1], $keyIDs)) {
 				$accessLevels = explode('|', $segments[0]);
