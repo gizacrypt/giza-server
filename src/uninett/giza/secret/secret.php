@@ -8,6 +8,8 @@ use \uninett\giza\core\GPG;
 use \uninett\giza\core\PGPPublicKey;
 use \uninett\giza\core\PopulatedGPG;
 use \uninett\giza\identity\Profile;
+use \uninett\giza\secret\input\AbstractInputValidator;
+use \uninett\giza\secret\output\AbstractOutputGenerator;
 
 /**
  * Giza API for secrets.  A Giza secret is a GPG encrypted file,
@@ -45,7 +47,7 @@ final class Secret {
 	 * @param Profile $profile The profile to check
 	 * @param int $mask Bit map of all qualifying access bits
 	 */
-	public static function getSecretsForProfile(Profile $profile = null) {
+	public static function getSecretsForProfile(Profile $profile = null, $mask = -1) {
 		if (is_null($profile)) {
 			$profile = Profile::fromStore();
 		}
@@ -87,32 +89,9 @@ final class Secret {
 	}
 
 	/**
-	 * Get the URL that the shell script should use to send updated secrets.
-	 *
-	 * @return string the URL
-	 */
-	public static function getCallbackURL() {
-		return (empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == 'off' ? 'http' : 'https')
-			. '://'
-			. $_SERVER['HTTP_HOST']
-			. dirname($_SERVER['PHP_SELF'])
-			;
-	}
-
-	/**
 	 * @var SecretStore the secret store where this secret is stored
 	 */
 	protected $store;
-
-	/**
-	 * @var string UUID of this secret
-	 */
-	protected $uuid;
-
-	/**
-	 * @var string UUID of the secret that replaces this secret, or null
-	 */
-	protected $nextUUID;
 
 	/**
 	 * @var PGPPublicKey the PGP public key used to sign this secret
@@ -159,7 +138,7 @@ final class Secret {
 		if ($key1 != $key2) {
 			throw new DomainException('Inner and outer signatures must be made with the same key.');
 		}
-		$this->key = PGPPublicKey::fromKeyId($key1);
+		$this->key = PGPPublicKey::fromKeyId(reset($key1));
 	}
 
 	/**
@@ -199,7 +178,7 @@ final class Secret {
 	 * @return string the UUID of this secret
 	 */
 	public function getUUID() {
-		return $this->metadata->getUUID();
+		return $this->metadata->getRevision();
 	}
 
 	/**
@@ -236,7 +215,8 @@ final class Secret {
 	 * @return Secret previous secret
 	 */
 	public function getPrevious() {
-		return static::getSecret($this->metadata->getPrevious());
+		$previous = $this->metadata->getPrevious();
+		return is_null($previous) ? NULL : static::getSecret($previous);
 	}
 
 	/**
@@ -245,7 +225,8 @@ final class Secret {
 	 * @return Secret secret this secret was based on
 	 */
 	public function getBasedOn() {
-		return static::getSecret($this->metadata->getBasedOn());
+		$basedOn = $this->metadata->getBasedOn();
+		return is_null($basedOn) ? NULL : static::getSecret($basedOn);
 	}
 
 	/**
@@ -265,34 +246,33 @@ final class Secret {
 	}
 
 	/**
+	 * Get the encrypted GPG payload.
+	 * This is a multi-line string that contains an ASCII-armoured GPG encrypted payload.
+	 *
+	 * @return string encrypted payload
+	 */
+	public function getEncryptedPayload() {
+		preg_match(
+			'_\n-----BEGIN PGP MESSAGE-----\n.+\n-----END PGP MESSAGE-----\n_s', 
+			$this->signedContents, 
+			$matches
+		);
+		return $matches[0];
+	}
+
+	/**
 	 * Generate a Giza file with an action
 	 *
 	 * @param string[string] $parameters parameters for how the file must be generated
-	 * @param Profile $profile the identity that requested the action, null to use current
+	 * @param Profile $identity the identity that requested the action, null to use current
 	 *
 	 * @return void, headers and a Content-Length header are sent, so no more output is accepted
+	 *
+	 * @throws RuntimeException if generation failed
 	 */
-	public function action($action, Profile $profile) {
-		header('Content-Description: File Transfer');
-		header('Content-Type: application/x-giza');
-		header('Content-Disposition: attachment; filename='.$this->getUUID().'.giza');
-		header('Cache-Control: no-cache');
-		$output = trim($this->rawContents)
-		        . "\n" . '-----BEGIN GIZA COMMAND-----'
-		        . "\n" . 'Action: ' . $action
-		        . (is_null($this->getNext())
-		        	? ''
-		        	: "\n" . 'Latest: ' . $this->getLatest()->getUUID()
-		        	)
-		        . "\n" . 'Callback: ' . static::getCallbackURL()
-		        . "\n" . '-----END GIZA COMMAND-----'
-		        . "\n"
-		        ;
-		header('Content-Length: ' . strlen($output));
-		ob_clean();
-		flush();
-		echo $output;
-		exit(0);
+	public function generateOutput($parameters, Profile $identity = null) {
+		$generator = AbstractOutputGenerator::getGenerator($parameters, $this, $identity);
+		$generator->generateOutput();
 	}
 
 	/**
@@ -301,37 +281,7 @@ final class Secret {
 	 * @return string name of this secret
 	 */
 	public function getName() {
-		return $this->store->getName($this);
-	}
-
-	/**
-	 * Get the creation time of this secret
-	 *
-	 * @return DateTime creation time of this secret
-	 */
-	public function getTimestamp() {
-		$timestamp = DateTime::createFromFormat(DATE_W3C, reset($this->getValues('Date')));
-		if (!$timestamp instanceof DateTime) {
-			throw new DomainException('Secret has invalid timestamp.');
-		} 
-	}
-
-	/**
-	 * @return DateTime
-	 *
-	 * @todo Check change type
-	 */
-	public function getContentChangedTimestamp() {
-		return $this->getTimestamp();
-	}
-
-	/**
-	 * Get the content type of this secret.
-	 *
-	 * @return string content type of this secret
-	 */
-	public function getContentType() {
-		return reset($this->getValues('Content-Type'));
+		return $this->store->getName($this->getUUID());
 	}
 
 	/**
@@ -369,13 +319,26 @@ final class Secret {
 	}
 
 	/**
+	 * Add a new secret, this can either be an update or a new chain.
+	 *
+	 * @return void secret was added
+	 *
+	 * @throws RuntimeException secret was not added
+	 */
+	public static function addSecret($contents) {
+		$secret = new Secret($contents);
+		$action = AbstractInputValidator::getValidator($secret->metadata->getAction(), $secret);
+		$action->validate();
+		static::getStore()->addValidSecret($secret);
+	}
+
+	/**
 	 * Comparison of objects in PHP happens through the __toString() method.
-	 * The UUID is the only guaranteed unique identifier,
-	 * so this implementation returns the UUID.
-	 * The implementation can change in the future.
+	 * It will return the raw contents of the secret, since it contains both payload and UUID,
+	 * and is therefore guaranteed to be unique.
 	 */
 	public function __toString() {
-		return $this->rawContents();
+		return $this->rawContents;
 	}
 
 	/**

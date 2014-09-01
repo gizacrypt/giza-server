@@ -64,7 +64,7 @@ class FileSecretStore implements SecretStore {
 		if ($secret instanceof Secret) {
 			$uuid = $secret->getUUID();
 			while(!is_null($secret)) {
-				$path = $this->getPathForSecret($path).'.name';
+				$path = $this->getPathForSecret($secret->getUUID()).'.name';
 				if (is_file($path)) {
 					return file_get_contents($path);
 				}
