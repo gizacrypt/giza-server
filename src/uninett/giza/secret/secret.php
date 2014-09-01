@@ -179,6 +179,34 @@ final class Secret {
 	}
 
 	/**
+	 * Determine whether this secret and another secret have a common ancestor.
+	 * Two secrets have a common ancestor if it is possible to eventually get to the same secret
+	 *  by calling getPrevious() on both secrets.
+	 *
+	 * @param Secret $secret the other secret to test whether it has a common ancestor with this secret
+	 *
+	 * @return boolean the secrets have a common ancestor
+	 */
+	protected function hasCommonAncestor($secret) {
+		if ($secret == $this) {
+			return true;
+		}
+		$ancestors = [];
+		while(!is_null($secret)) {
+			$ancestors[] = $secret;
+			$secret = $secret->getPrevious();
+		}
+		$secret = $this;
+		while(!is_null($secret)) {
+			if (in_array($secret, $ancestors)) {
+				return true;
+			}
+			$secret = $secret->getPrevious();
+		}
+		return false;
+	}
+
+	/**
 	 * Get the UUID of this secret.
 	 *
 	 * The UUID is used as a unique persistent identifier of a secret.
