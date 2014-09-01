@@ -21,6 +21,23 @@ final class Secret {
 	const ACCESS_READ = 4;
 	const ACCESS_WRITE = 2;
 	const ACCESS_ADMIN = 1;
+	const ACCESS_FULL = 7; // ACCESS_READ|ACCESS_WRITE|ACCESS_ADMIN
+
+	const ACTION_NEW = 'new';
+	const ACTION_READ = 'read';
+	const ACTION_UPDATE = 'update';
+	const ACTION_WRITE = 'write';
+	const ACTION_DELETE = 'delete';
+	const ACTION_META = 'meta';
+
+	protected static $actionPermissions = [
+		'new' => 0, // like newupload
+		'read' => 4, // self::ACCESS_READ
+		'update' => -1, // disallow
+		'write' => 2, // self::ACCESS_WRITE
+		'delete' => 1, // self::ACCESS_ADMIN
+		'meta' => 3, // self::ACCESS_WRITE|self::ACCESS_ADMIN
+	];
 
 	/**
 	 * Get all secrets that are accessible from either the current or a given profile.
@@ -52,6 +69,21 @@ final class Secret {
 	 */
 	public static function getSecret($uuid) {
 		return Giza::getInstance()->getSecretStore()->getSecret($uuid);
+	}
+
+	/**
+	 * Get required permissions to execute an action
+	 *
+	 * @param string $action The action
+	 *
+	 * @return int required permissions
+	 * @throws RuntimeException if the requested action is unknown
+	 */
+	public static function getRequiredPermissionsForAction($action) {
+		if (!isset(static::$actionPermissions[strtolower($action)])) {
+			throw new DomainException('Unknown action: '.$action);
+		}
+		return static::$actionPermissions[strtolower($action)];
 	}
 
 	/**
