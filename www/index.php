@@ -13,6 +13,13 @@ if (isset($_GET['uuid'])) {
 	exit;
 } elseif (isset($_POST['secret'])) {
 	\uninett\giza\secret\Secret::addSecret($_POST['secret']);
+} elseif ($_SERVER['QUERY_STRING']) {
+	header('Location: ' . (empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == 'off' ? 'http' : 'https')
+			. '://'
+			. $_SERVER['HTTP_HOST']
+			. dirname($_SERVER['SCRIPT_NAME'])
+		, true, 301);
+	exit;
 }
 
 foreach(\uninett\giza\secret\Secret::getSecretsForProfile() as $secret) {
