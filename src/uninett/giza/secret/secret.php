@@ -5,6 +5,7 @@ use \Serializable;
 
 use \uninett\giza\Giza;
 use \uninett\giza\core\GPG;
+use \uninett\giza\core\PGPPublicKey;
 use \uninett\giza\core\PopulatedGPG;
 use \uninett\giza\identity\Profile;
 
@@ -20,26 +21,6 @@ final class Secret {
 	const ACCESS_READ = 4;
 	const ACCESS_WRITE = 2;
 	const ACCESS_ADMIN = 1;
-
-	/**
-	 * @var string $contents contents of the secret
-	 * @var SecretStore $store store of the secret
-	 */
-	public function __construct($contents, SecretStore $store = null) {
-		$this->store = $store;
-		$this->rawContents = $contents;
-		$gpg = new PopulatedGPG();
-		$this->signedContents = $gpg->verifyClear($this->rawContents, $key1);
-		preg_match('_\n-----BEGIN PGP SIGNED MESSAGE-----\n.+_s', $this->signedContents, $matches);
-		$this->rawMetadata = $matches[0];
-		if (!$this->rawMetadata) {
-			throw new DomainException('No signed metadata found');
-		}
-		$this->signedMetadata = $gpg->verifyClear($this->rawMetadata, $key2);
-		if ($key1 != $key2) {
-			throw new DomainException('Inner and outer signatures must be made with the same key.');
-		}
-	}
 
 	/**
 	 * Get all secrets that are accessible from either the current or a given profile.
@@ -102,6 +83,11 @@ final class Secret {
 	protected $nextUUID;
 
 	/**
+	 * @var PGPPublicKey the PGP public key used to sign this secret
+	 */
+	protected $key;
+
+	/**
 	 * @var string the raw contents of this secret
 	 */
 	protected $rawContents;
@@ -121,6 +107,30 @@ final class Secret {
 	 */
 	protected $signedMetadata;
 
+	/**
+	 * @param string $contents contents of the secret
+	 * @param SecretStore $store store of the secret
+	 *
+	 * @throws RuntimeException if the secret is wrongly formatted or has an invalid signature
+	 */
+	public function __construct($contents, SecretStore $store = null) {
+		$this->store = $store;
+		$this->rawContents = $contents;
+		$gpg = new PopulatedGPG();
+		$this->signedContents = $gpg->verifyClear($this->rawContents, $key1);
+		preg_match('_\n-----BEGIN PGP SIGNED MESSAGE-----\n.+_s', $this->signedContents, $matches);
+		$this->rawMetadata = $matches[0];
+		if (!$this->rawMetadata) {
+			throw new DomainException('No signed metadata found');
+		}
+		$this->signedMetadata = $gpg->verifyClear($this->rawMetadata, $key2);
+		if ($key1 != $key2) {
+			throw new DomainException('Inner and outer signatures must be made with the same key.');
+		}
+		$this->key = PGPPublicKey::fromKeyId($key1);
+	}
+
+	/**
 	 * Get all values for a given key from the secret's metadata
 	 *
 	 * @param string $key key whose values are to be returned
@@ -325,13 +335,13 @@ final class Secret {
 	 */
 	public function getPermissions(Profile $user) {
 		$result = 0;
-		$keys = [];
+		$keyIDs = [];
 		foreach($user->getPGPPublicKeys() as $key) {
-			$keys[] = $key->getKeyID();
+			$keyIDs[] = $key->getKeyID();
 		}
-		foreach($this->getValues('Access') as $line) {
+		foreach($this->getMetadataValues('Access') as $line) {
 			$segments = preg_split('/\\s+/', $line, 3);
-			if (in_array($segments[1], $keys)) {
+			if (in_array($segments[1], $keyIDs)) {
 				$accessLevels = explode('|', $segments[0]);
 				if (in_array('ADMIN', $accessLevels)) $result |= self::ACCESS_ADMIN;
 				if (in_array('WRITE', $accessLevels)) $result |= self::ACCESS_WRITE;
@@ -339,6 +349,15 @@ final class Secret {
 			}
 		}
 		return $result;
+	}
+
+	/**
+	 * Get the key this secret was signed with.
+	 *
+	 * @return PGPPublicKey the public key
+	 */
+	public function getSigningKey() {
+		return $this->key();
 	}
 
 	/**
