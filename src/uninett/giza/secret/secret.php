@@ -421,6 +421,16 @@ final class Secret {
 	}
 
 	/**
+	 * Comparison of objects in PHP happens through the __toString() method.
+	 * The UUID is the only guaranteed unique identifier,
+	 * so this implementation returns the UUID.
+	 * The implementation can change in the future.
+	 */
+	public function __toString() {
+		return $this->rawContents();
+	}
+
+	/**
 	 * Returns expire object
 	 *
 	 * @return Expire
