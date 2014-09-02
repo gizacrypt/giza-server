@@ -8,11 +8,11 @@
 function o($str) { echo htmlspecialchars($str); }
 function qs($arr) { o(http_build_query($arr)); }
 
-if (isset($_GET['uuid'])) {
+if ($uploaded = file_get_contents('php://input')) {
+	\uninett\giza\secret\Secret::addSecret($uploaded);
+} elseif (isset($_GET['uuid'])) {
 	\uninett\giza\secret\Secret::getSecret($_GET['uuid'])->generateOutput($_GET);
 	exit;
-} elseif (isset($_POST['secret'])) {
-	\uninett\giza\secret\Secret::addSecret($_POST['secret']);
 } elseif ($_SERVER['QUERY_STRING']) {
 	header('Location: ' . (empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == 'off' ? 'http' : 'https')
 			. '://'
