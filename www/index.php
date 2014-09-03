@@ -10,6 +10,8 @@ function qs($arr) { o(http_build_query($arr)); }
 
 if ($uploaded = file_get_contents('php://input')) {
 	\uninett\giza\secret\Secret::addSecret($uploaded);
+	header('X-Giza-Result: 200 OK', true, 200);
+	exit;
 } elseif (isset($_GET['uuid'])) {
 	\uninett\giza\secret\Secret::getSecret($_GET['uuid'])->generateOutput($_GET);
 	exit;
