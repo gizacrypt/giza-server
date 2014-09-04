@@ -9,9 +9,33 @@ function o($str) { echo htmlspecialchars($str); }
 function qs($arr) { o(http_build_query($arr)); }
 
 if ($uploaded = file_get_contents('php://input')) {
-	\uninett\giza\secret\Secret::addSecret($uploaded);
-	header('X-Giza-Result: 200 OK', true, 200);
-	exit;
+	try {
+		\uninett\giza\secret\Secret::addSecret($uploaded);
+		header('Content-Type: application/json', true, 200);
+		die(json_encode([
+			'result' => '200 OK',
+		], JSON_PRETTY_PRINT) . "\n");
+	} catch (Exception $e) {
+		header('Content-Type: application/json', true, 500);
+		die(json_encode([
+			'result' => '500 Internal Server Error',
+			'exception' => get_class($e),
+			'message' => $e->getMessage(),
+			'code' => $e->getCode(),
+			'trace' => array_merge(
+				[$e->getFile() . '(' . $e->getLine() . ')'],
+				array_map(
+					function($l){
+						return 
+							$l['file'] .
+							'(' . $l['line'] . '): ' .
+							$l['function'] . 
+							'(' . implode(',', array_map(function($t){return is_object($t)?get_class($t):gettype($t);}, $l['args'])) . ')';
+					},
+					$e->getTrace())
+			),
+		], JSON_PRETTY_PRINT) . "\n");
+	}
 } elseif (isset($_GET['uuid'])) {
 	\uninett\giza\secret\Secret::getSecret($_GET['uuid'])->generateOutput($_GET);
 	exit;
