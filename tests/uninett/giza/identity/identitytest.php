@@ -59,9 +59,9 @@ const IMAGE = 'iVBORw0KGgoAAAANSUhEUgAAALEAAAAwCAYAAABexZu4AAAHfklEQVR42u2de3AV1
 		$this->assertIdentity($identity);
 	}
 
-    /**
-     * @depends testReadIdentity
-     */
+	/**
+	 * @depends testReadIdentity
+	 */
 	public function testWriteIdentity() {
 		$identity = new AttributeAssertion([
 			'uid' => ['jorn.dejong@uninett.no'],
