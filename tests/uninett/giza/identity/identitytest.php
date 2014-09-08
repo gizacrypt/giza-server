@@ -2,6 +2,7 @@
 
 use \uninett\giza\GizaTestCase;
 use \uninett\giza\identity\AttributeAssertion;
+use \uninett\giza\identity\Image;
 
 class IdentityTest extends GizaTestCase {
 
@@ -68,6 +69,19 @@ const IMAGE = 'iVBORw0KGgoAAAANSUhEUgAAALEAAAAwCAYAAABexZu4AAAHfklEQVR42u2de3AV1
 			'mail' => ['jorn.dejong@uninett.no'],
 			'displayName' => ['Jørn Åne de Jong'],
 			'photo' => [base64_decode(static::IMAGE)],
+		]);
+		$this->assertIdentity(new AttributeAssertion($identity->serialize()));
+	}
+
+	/**
+	 * @depends testReadIdentity
+	 */
+	public function testWriteObjectIdentity() {
+		$identity = new AttributeAssertion([
+			'uid' => ['jorn.dejong@uninett.no'],
+			'mail' => ['jorn.dejong@uninett.no'],
+			'displayName' => ['Jørn Åne de Jong'],
+			'photo' => [Image::fromBytes(base64_decode(static::IMAGE))],
 		]);
 		$this->assertIdentity(new AttributeAssertion($identity->serialize()));
 	}
