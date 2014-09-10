@@ -7,11 +7,12 @@ class OutputGeneratorTest extends GizaTestCase {
 
 const EXPECTED_NEW_SECRET = '-----BEGIN GIZA COMMAND-----
 Action: new
-Callback-URL: http://.
-Method: edit
+Name: test
+Content-Type: password
 Access: READ|WRITE|ACCESS 0000000000000000
 Access: READ 1111111111111111
-Content-Type: password
+Callback-URL: http://.
+Method: edit
 -----END GIZA COMMAND-----';
 
 	public function testGenerateNewSecret() {
