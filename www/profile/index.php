@@ -14,7 +14,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	header('Location: https://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
 }
 
-$storedProfile = uninett\giza\identity\Profile::fromStore();
+try {
+	$storedProfile = uninett\giza\identity\Profile::fromStore();
+} catch (Exception $e) {
+	/* do nothing, no profile is a normal case here, as we're about to create one */
+}
 
 $profile = isset($storedProfile) ? $storedProfile : $candidateProfile;
 
