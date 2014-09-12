@@ -10,7 +10,11 @@ function qs($arr) { o(http_build_query($arr)); }
 
 if ($uploaded = file_get_contents('php://input')) {
 	try {
-		\uninett\giza\secret\Secret::addSecret($uploaded);
+		$params = [];
+		if (isset($_SERVER['HTTP_X_GIZA_NAME'])) {
+			$params['name'] = $_SERVER['HTTP_X_GIZA_NAME'];
+		}
+		\uninett\giza\secret\Secret::addSecret($uploaded, $params);
 		header('Content-Type: application/json', true, 200);
 		die(json_encode([
 			'result' => '200 OK',
