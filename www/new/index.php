@@ -6,6 +6,12 @@
  */
 
 function o($str) { return htmlspecialchars($str); }
+function getBaseURL() {
+	return (empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == 'off' ? 'http' : 'https')
+			. '://'
+			. $_SERVER['HTTP_HOST']
+			. dirname($_SERVER['SCRIPT_NAME']);
+}
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	if (!in_array($_POST['content-type'], ['password', 'select', 'input', 'auto'])) {
@@ -28,16 +34,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		'name' => $_POST['name'],
 		'method' => $_POST['content-type'] == 'password' ? 'edit' : 'upload',
 		'content-type' => $_POST['content-type-' . $_POST['content-type']],
+		'callback-url' => dirname(getBaseURL()) . '/',
 		'access' => $access,
 	])->generateOutput();
 	exit;
 }
 if ($_SERVER['REQUEST_METHOD'] == 'POST' || $_SERVER['QUERY_STRING']) {
-	header('Location: ' . (empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == 'off' ? 'http' : 'https')
-			. '://'
-			. $_SERVER['HTTP_HOST']
-			. dirname($_SERVER['SCRIPT_NAME'])
-		, true, 301);
+	header('Location: ' . getBaseURL(), true, 301);
 	exit;
 }
 
