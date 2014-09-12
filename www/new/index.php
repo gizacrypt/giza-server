@@ -56,6 +56,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' || $_SERVER['QUERY_STRING']) {
 		<label for="content-type-password">password</label>
 	</div>
 	<div>
+		<input type="radio" name="content-type" value="auto" id="content-type-auto">
+		<label for="content-type-auto">auto</label>
+	</div>
+	<div>
 		<input type="radio" name="content-type" value="select" id="content-type-select">
 		<label for="content-type-select">
 			<select name="content-type-select">
@@ -68,10 +72,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' || $_SERVER['QUERY_STRING']) {
 	<div>
 		<input type="radio" name="content-type" value="input" id="content-type-input">
 		<label for="content-type-input"><input type="text" name="content-type-input"></label>
-	</div>
-	<div>
-		<input type="radio" name="content-type" value="auto" id="content-type-auto">
-		<label for="content-type-auto">auto</label>
 	</div>
 </p>
 
