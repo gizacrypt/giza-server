@@ -11,7 +11,7 @@ Name: test
 Content-Type: password
 Access: READ|WRITE|ACCESS 0000000000000000
 Access: READ 1111111111111111
-Callback-URL: http://.
+Callback-URL: http://giza.labs.uninett.no/new/
 Method: edit
 -----END GIZA COMMAND-----';
 
@@ -21,6 +21,7 @@ Method: edit
 			'name' => 'test',
 			'method' => 'edit',
 			'content-type' => 'password',
+			'callback-url' => 'http://giza.labs.uninett.no/new/',
 			'access' => [
 				'0000000000000000' => 'READ|WRITE|ACCESS',
 				'1111111111111111' => 'READ',
