@@ -52,6 +52,8 @@ if ($uploaded = file_get_contents('php://input')) {
 	exit;
 }
 
+include './_header.php' ;
+
 foreach(\uninett\giza\secret\Secret::getSecretsForProfile() as $secret) {
 ?>
 
@@ -64,5 +66,7 @@ foreach(\uninett\giza\secret\Secret::getSecretsForProfile() as $secret) {
 		<a href="./?<?php qs(['uuid' => $secret->getUUID(), 'action' => 'write', 'method' => 'upload']); ?>">upload</a>
 	</p>
 </div>
+
+include './_footer.php' ;
 
 <?php } ?>
