@@ -67,6 +67,9 @@ foreach(\uninett\giza\secret\Secret::getSecretsForProfile() as $secret) {
 	</p>
 </div>
 
+<?php } 
+
 include './_footer.php' ;
 
-<?php } ?>
+?>
+
