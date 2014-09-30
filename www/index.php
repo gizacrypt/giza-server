@@ -5,8 +5,8 @@
  * @copyright Copyright (c) 2014, UNINETT
  */
 
-function o($str) { echo htmlspecialchars($str); }
-function qs($arr) { o(http_build_query($arr)); }
+function o($str) { return htmlspecialchars($str); }
+function qs($arr) { return o(http_build_query($arr)); }
 
 if ($uploaded = file_get_contents('php://input')) {
 	try {
@@ -57,19 +57,16 @@ $title = 'Giza' ;
 include './_header.php' ;
 
 foreach(\uninett\giza\secret\Secret::getSecretsForProfile() as $secret) {
-?>
-
-<div>
-	<p><?php o($secret->getName()); ?></p>
+	echo '<div>
+	<p>' . o($secret->getName()) . '</p>
 	<p>
-		<a href="./?<?php qs(['uuid' => $secret->getUUID(), 'action' => 'read', 'method' => 'view']); ?>">view</a>
-		<a href="./?<?php qs(['uuid' => $secret->getUUID(), 'action' => 'read', 'method' => 'save']); ?>">save</a>
-		<a href="./?<?php qs(['uuid' => $secret->getUUID(), 'action' => 'write', 'method' => 'edit']); ?>">edit</a>
-		<a href="./?<?php qs(['uuid' => $secret->getUUID(), 'action' => 'write', 'method' => 'upload']); ?>">upload</a>
+		<a href="./?'. qs(['uuid' => $secret->getUUID(), 'action' => 'read', 'method' => 'view']).'">view</a>
+		<a href="./?'. qs(['uuid' => $secret->getUUID(), 'action' => 'read', 'method' => 'save']).'">save</a>
+		<a href="./?'. qs(['uuid' => $secret->getUUID(), 'action' => 'write', 'method' => 'edit']).'">edit</a>
+		<a href="./?'. qs(['uuid' => $secret->getUUID(), 'action' => 'write', 'method' => 'upload']).'">upload</a>
 	</p>
-</div>
-
-<?php } 
+</div>' ;
+	}
 
 include './_footer.php' ;
 
