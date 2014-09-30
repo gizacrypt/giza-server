@@ -52,6 +52,8 @@ if ($uploaded = file_get_contents('php://input')) {
 	exit;
 }
 
+$title = 'Giza' ;
+
 include './_header.php' ;
 
 foreach(\uninett\giza\secret\Secret::getSecretsForProfile() as $secret) {
