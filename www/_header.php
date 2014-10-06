@@ -3,7 +3,8 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title><?php echo htmlspecialchars($title) ?></title>
-<link rel="icon" type="image/svg+xml" href="/static/gfx/icon-giza.svg">
-<link rel="stylesheet" type="text/css" href="/static/css/giza.css">
+<link rel="icon" type="image/svg+xml" href="static/gfx/icon-giza.svg">
+<link rel="stylesheet" type="text/css" href="static/css/giza.css">
+<link rel="stylesheet" type="text/css" href="static/css/view.css">
 </head>
 <body>

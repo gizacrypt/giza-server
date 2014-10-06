@@ -53,20 +53,44 @@ if ($uploaded = file_get_contents('php://input')) {
 }
 
 $title = 'Giza' ;
-
 include './_header.php' ;
 
+echo '<div id="giza-view">'."\n";
+
 foreach(\uninett\giza\secret\Secret::getSecretsForProfile() as $secret) {
-	echo '<div>
-	<p>' . o($secret->getName()) . '</p>
-	<p>
-		<a href="./?'. qs(['uuid' => $secret->getUUID(), 'action' => 'read', 'method' => 'view']).'">view</a>
-		<a href="./?'. qs(['uuid' => $secret->getUUID(), 'action' => 'read', 'method' => 'save']).'">save</a>
-		<a href="./?'. qs(['uuid' => $secret->getUUID(), 'action' => 'write', 'method' => 'edit']).'">edit</a>
-		<a href="./?'. qs(['uuid' => $secret->getUUID(), 'action' => 'write', 'method' => 'upload']).'">upload</a>
-	</p>
-</div>' ;
+	echo '    <div>
+        <div><div>
+            <img src="static/gfx/icon-menu-3.svg" alt="">
+            <div>';
+#	TODO: gray out meaningless choices
+	echo '<a href="?' . qs(['uuid' => $secret->getUUID(), 'action' => 'read', 'method' => 'view']) . '"><span><img src="static/gfx/icon-view.svg" alt=""></span><span>Decrypt &amp; view</span></a>';
+	echo '<a href="?' . qs(['uuid' => $secret->getUUID(), 'action' => 'read', 'method' => 'save']) . '"><span><img src="static/gfx/icon-download.svg" alt=""></span><span>Decrypt &amp; save plaintext</span></a>';
+#	echo '<a href=""><span><img src="static/gfx/icon-update.svg" alt=""></span><span>Update with new users</span></a>';
+#	TODO: display only if access level >= 2
+	echo '<a href="?' . qs(['uuid' => $secret->getUUID(), 'action' => 'write', 'method' => 'edit']) . '"><span><img src="static/gfx/icon-edit.svg" alt=""></span><span>Edit</span></a>';
+	echo '<a href="?' . qs(['uuid' => $secret->getUUID(), 'action' => 'write', 'method' => 'upload']) . '"><span><img src="static/gfx/icon-upload.svg" alt=""></span><span>Upload new version</span></a>';
+#	echo '<a href=""><span><img src="static/gfx/icon-revert.svg" alt=""></span><span>Revert to previous version</span></a>';
+#	echo '<a href=""><span><img src="static/gfx/icon-history.svg" alt=""></span><span>Full history</span><span><img src="gfx/icon-more.svg" alt=""></span></a>';
+#	TODO: display only if access level >= 3
+#	echo '<a href=""><span><img src="static/gfx/icon-gears.svg" alt=""></span><span>Users &amp; properties</span><span><img src="gfx/icon-more.svg" alt=""></span></a>';
+#	echo '<a href=""><span><img src="static/gfx/icon-delete.svg" alt=""></span><span>Delete</span></a>';
+	echo '</div>
+        </div></div>
+        <div>
+            <a href="?' . qs(['uuid' => $secret->getUUID(), 'action' => 'read', 'method' => 'view']) . '">' . o($secret->getName()) . '</a>
+        </div>
+        <div><div>
+            <!-- user list icon -->
+            <div><!-- user list --></div>
+        </div></div>
+        <div><div>
+            <!-- status box icon -->
+            <div><!-- status box --></div>
+        </div></div>
+    </div>' ;
 	}
+
+echo '</div>'."\n";
 
 include './_footer.php' ;
 

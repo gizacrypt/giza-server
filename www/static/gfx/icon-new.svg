@@ -1,0 +1,20 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	width="1em" height="1em"
+	viewBox="0 0 34 34">
+<defs>
+<path id="r" d="M 15,10 h 4 l -2,-9 z"/>
+</defs>
+<g style="stroke-width:0.5; stroke: black; stroke-linecap:butt; stroke-linejoin:miter; fill:black">
+<use xlink:href="#r"/>
+<use xlink:href="#r" transform="rotate(51.4286 17 17)"/>
+<use xlink:href="#r" transform="rotate(102.8571 17 17)"/>
+<use xlink:href="#r" transform="rotate(154.2857 17 17)"/>
+<use xlink:href="#r" transform="rotate(-154.2857 17 17)"/>
+<use xlink:href="#r" transform="rotate(-102.8571 17 17)"/>
+<use xlink:href="#r" transform="rotate(-51.4286 17 17)"/>
+</g>
+</svg>
