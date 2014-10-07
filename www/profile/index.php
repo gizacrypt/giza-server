@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	if (isset($_POST['storeProfile'])) {
 		$candidateProfile->store();
 	}
-	header('Location: https://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
+	header('Location: https://' . $_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
 }
 
 try {
@@ -75,7 +75,7 @@ foreach(array_merge([$profile], $profile->getAttributeAssertions()) as $source =
 	for($i=0;$i<$count;$i++) {
 		$displayName = isset($displayNames[$i]) ? htmlentities($displayNames[$i]) : '';
 		$mail = isset($mails[$i]) ? htmlentities($mails[$i]) : '';
-		$image = isset($images[$i]) ? '<img src="'.htmlentities($images[$i]->toBytes()->serialize()).'" alt="">' : '';
+		$image = isset($images[$i]) ? '<img src="' . htmlentities($images[$i]->toBytes()->serialize()) . '" alt="">' : '';
 		$sshKey = isset($sshKeys[$i]) ? htmlspecialchars($sshKeys[$i]->getHexFingerprint()) : '';
 		$pgpKey = isset($pgpKeys[$i]) ? htmlspecialchars($pgpKeys[$i]->getKeyID()) : '';
 ?>
