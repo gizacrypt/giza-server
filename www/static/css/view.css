@@ -34,5 +34,9 @@
 	{ height: .85em ;
 	  vertical-align: middle ;
 	  padding-bottom: .2em }
-#giza-view .red
+#giza-view a
+	{ color: gray }
+#giza-view a[href]
+	{ color: black }
+#giza-view .unavailable > div > a
 	{ color: red }
