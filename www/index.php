@@ -57,7 +57,8 @@ if ($uploaded = file_get_contents('php://input')) {
 $title = 'Giza' ;
 include './_header.php' ;
 
-echo '<div id="giza-tabs">
+echo '<h1><img src="static/gfx/icon-rank-3.svg" alt="">Giza</h1>
+<div id="giza-tabs">
 <span id="giza-tabs-selected">Secrets</span> <a href="#">New secret</a> <a href="#">Profile</a> <a href="#">Help</a>
 </div>
 <div id="giza-sheet">

@@ -4,6 +4,9 @@ body
 	  max-width: 56em ;
 	  background-color: silver;
 	  color: black; }
+h1	{ text-transform: uppercase }
+h1 img	{ height: 1.2em ;
+	  vertical-align: bottom }
 a
 	{ text-decoration: none }
 a:hover
