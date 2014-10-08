@@ -67,7 +67,7 @@ foreach(Secret::getSecretsForProfile() as $secret) {
 	$expired = FALSE ;
 	$missing = FALSE ;
 	foreach ($secret->getMetadata()->getIdentities() as $profile) {
-		$bitmask = $secret->getPermissions($profile) ;
+		$bitmask = $secret->getMetadata()->getPermissions($profile) ;
 		$userlist[$profile->getUniqueId()] = array (
 			'expired' => FALSE ,
 			'missing' => TRUE ,
