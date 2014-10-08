@@ -131,7 +131,8 @@ foreach(Secret::getSecretsForProfile() as $secret) {
 		echo '<a href=""' . (($user['missing'])?' class="missing"':'') . (($user['expired'])?' class="expired"':'') . '>' .
 		'<span><img src="static/gfx/icon-no-photo.svg" alt=""></span>' .
 		'<span>' . $user['name'] . '</span>' .
-		'<span><img src="static/gfx/icon-rank-' . $user['accesslevel'] . '.svg" alt=""></span>' ;
+		'<span><img src="static/gfx/icon-rank-' . $user['accesslevel'] . '.svg" alt=""></span>' .
+		'</a>';
 		}
 	echo '</div>
         </div></div>
