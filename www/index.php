@@ -63,7 +63,7 @@ foreach(Secret::getSecretsForProfile() as $secret) {
 	$accesslevel = (($secret->getMetadata()->hasPermission(Secret::ACCESS_WRITE))?
 		(($secret->getMetadata()->hasPermission(Secret::ACCESS_ADMIN))?3:2):1) ;
 	$readable = $secret->isReadableByProfile() ;
-	$userlist = array();
+	$userlist = [];
 	$expired = FALSE ;
 	$missing = FALSE ;
 	foreach ($secret->getMetadata()->getIdentities() as $profile) {
