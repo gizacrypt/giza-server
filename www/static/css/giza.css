@@ -5,17 +5,16 @@
 	  background-color: #e0e0e0 ;
 	  padding: 0.25em ;
 	  text-align: center ;
-	  border: thin solid gray ;
-	  border-radius: 0.25em 0.25em 0 0 }
+	  border-radius: 0.25em 0.25em 0 0 ;
+	  position: relative ;
+	  z-index: -1 }
 #giza-tabs #giza-tabs-selected
 	{ color: black ;
 	  background-color: white ;
-	  border-bottom: thin solid white }
+	  z-index: 0 }
 #giza-sheet
 	{ background-color: white ;
 	  padding: 1em ;
-	  border: thin solid gray ;
-	  border-top: none ;
 	  margin: 0 0 0.5em 0 ;
-	  border-radius: 0 0 0.25em 0.25em ;
+	  border-radius: 0 0.25em 0.25em 0.25em ;
 	  box-shadow: 0.5em 0.5em 1.5em gray }

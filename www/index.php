@@ -57,7 +57,11 @@ if ($uploaded = file_get_contents('php://input')) {
 $title = 'Giza' ;
 include './_header.php' ;
 
-echo '<div id="giza-view">'."\n";
+echo '<div id="giza-tabs">
+<span id="giza-tabs-selected">Secrets</span> <a href="#">New secret</a> <a href="#">Profile</a> <a href="#">Help</a>
+</div>
+<div id="giza-sheet">
+<div id="giza-view">'."\n";
 
 foreach(Secret::getSecretsForProfile() as $secret) {
 	$accesslevel = (($secret->getMetadata()->hasPermission(Secret::ACCESS_WRITE))?
@@ -128,7 +132,7 @@ foreach(Secret::getSecretsForProfile() as $secret) {
             <img src="static/gfx/icon-users' . (($missing)?'-missing':'') . (($expired)?'-expired':'') . '.svg" alt="">
             <div>';
 	foreach ($userlist as $user) {
-		echo '<a href=""' . (($user['missing'])?' class="missing"':'') . (($user['expired'])?' class="expired"':'') . '>' .
+		echo '<a href="#"' . (($user['missing'])?' class="missing"':'') . (($user['expired'])?' class="expired"':'') . '>' .
 		'<span><img src="static/gfx/no-photo.svg" alt=""></span>' .
 		'<span>' . $user['name'] . '</span>' .
 		'<span><img src="static/gfx/icon-rank-' . $user['accesslevel'] . '.svg" alt=""></span>' .
@@ -143,7 +147,7 @@ foreach(Secret::getSecretsForProfile() as $secret) {
     </div>' . "\n" ;
 	}
 
-echo '</div>'."\n";
+echo '</div>'."\n" . '</div>'."\n" ;
 
 include './_footer.php' ;
 
