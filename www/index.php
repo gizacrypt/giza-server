@@ -62,8 +62,34 @@ echo '<div id="giza-view">'."\n";
 foreach(Secret::getSecretsForProfile() as $secret) {
 	$accesslevel = (($secret->getMetadata()->hasPermission(Secret::ACCESS_WRITE))?
 		(($secret->getMetadata()->hasPermission(Secret::ACCESS_ADMIN))?3:2):1) ;
-#	TODO: IsReadableByProfile
-	$readable = !$readable ;
+	$readable = $secret->isReadableByProfile() ;
+	$userlist = array();
+	$expired = FALSE ;
+	$missing = FALSE ;
+	foreach ($secret->getMetadata()->getIdentities() as $profile) {
+		$bitmask = $secret->getPermissions($profile) ;
+		$userlist[$profile->getUniqueId()] = array (
+			'expired' => FALSE ,
+			'missing' => TRUE ,
+			'name' => $profile->getDisplayName() ,
+			'accesslevel' => 1 + ($bitmask&2 != 0) + ($bitmask&1 != 0)
+			) ;
+		}
+	foreach ($secret->getIdentities() as $profile) {
+		$id = $profile->getUniqueId() ;
+		if (isset($userlist[$id])) $userlist[$id]['missing'] = FALSE ;
+		else {
+			$expired = TRUE ;
+			$userlist[$id] = array (
+				'expired' => TRUE ,
+				'missing' => FALSE ,
+				'name' => $profile->getDisplayName() ,
+				'accesslevel' => 0
+				) ;
+			}
+		}
+	foreach ($userlist as $id) if ($id['missing']) $missing = TRUE ;
+
 	echo '    <div' . (($readable)?'':' class="unavailable"') . '>
         <div><div>
             <img src="static/gfx/icon-menu-' . $accesslevel . '.svg" alt="">
@@ -99,8 +125,15 @@ foreach(Secret::getSecretsForProfile() as $secret) {
             <a href="?' . qs(['uuid' => $secret->getUUID(), 'action' => 'read', 'method' => 'view']) . '">' . o($secret->getName()) . '</a>
         </div>
         <div><div>
-            <!-- user list icon -->
-            <div><!-- user list --></div>
+            <img src="static/gfx/icon-users' . (($missing)?'-missing':'') . (($expired)?'-expired':'') . '.svg" alt="">
+            <div>';
+	foreach ($userlist as $user) {
+		echo '<a href=""' . (($user['missing'])?' class="missing"':'') . (($user['expired'])?' class="expired"':'') . '>' .
+		'<span><img src="static/gfx/icon-no-photo.svg" alt=""></span>' .
+		'<span>' . $user['name'] . '</span>' .
+		'<span><img src="static/gfx/icon-rank-' . $user['accesslevel'] . '.svg" alt=""></span>' ;
+		}
+	echo '</div>
         </div></div>
         <div><div>
             <!-- status box icon -->
