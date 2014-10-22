@@ -60,7 +60,7 @@ include './_header.php' ;
 
 echo '<h1><img src="static/gfx/icon-rank-3.svg" alt="">Giza</h1>
 <div id="giza-tabs">
-<span id="giza-tabs-selected">Secrets</span> <a href="new/">New secret</a> <a href="profile/">Profile</a> <!-- <a href="#">Help</a> -->
+<span id="giza-tabs-selected">Secrets</span> <a href="new/">New secret</a> <a href="profile/">Profile</a> <a href="help/">Help</a>
 </div>
 <div id="giza-sheet">
 <div id="giza-view">'."\n";
