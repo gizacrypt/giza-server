@@ -6,6 +6,7 @@
  */
 
 use \uninett\giza\secret\Secret ;
+use \uninett\giza\identity\Profile ;
 
 function o($str) { return htmlspecialchars($str); }
 function qs($arr) { return o(http_build_query($arr)); }
@@ -59,7 +60,7 @@ include './_header.php' ;
 
 echo '<h1><img src="static/gfx/icon-rank-3.svg" alt="">Giza</h1>
 <div id="giza-tabs">
-<span id="giza-tabs-selected">Secrets</span> <a href="#">New secret</a> <a href="#">Profile</a> <a href="#">Help</a>
+<span id="giza-tabs-selected">Secrets</span> <a href="new/">New secret</a> <a href="profile/">Profile</a> <!-- <a href="#">Help</a> -->
 </div>
 <div id="giza-sheet">
 <div id="giza-view">'."\n";
@@ -95,6 +96,9 @@ foreach(Secret::getSecretsForProfile() as $secret) {
 		}
 	foreach ($userlist as $id) if ($id['missing']) $missing = TRUE ;
 
+	$author = o(Profile::getActiveFromKey($secret->getSigningKey())->getDisplayName()) ;
+	$date = o($secret->getMetadata()->getDate()->format('Y-m-d')) ;
+
 	echo '    <div' . (($readable)?'':' class="unavailable"') . '>
         <div><div>
             <img src="static/gfx/icon-menu-' . $accesslevel . '.svg" alt="">
@@ -119,9 +123,9 @@ foreach(Secret::getSecretsForProfile() as $secret) {
 #		echo '<a href=""><span><img src="static/gfx/icon-history.svg" alt=""></span><span>Full history</span><span><img src="gfx/icon-more.svg" alt=""></span></a>';
 
 		if ($accesslevel == 3) { 
-#		echo '<a href=""><span><img src="static/gfx/icon-gears.svg" alt=""></span><span>Users &amp; properties</span><span><img src="gfx/icon-more.svg" alt=""></span></a>';
+#			echo '<a href=""><span><img src="static/gfx/icon-gears.svg" alt=""></span><span>Users &amp; properties</span><span><img src="gfx/icon-more.svg" alt=""></span></a>';
 
-#		echo '<a href=""><span><img src="static/gfx/icon-delete.svg" alt=""></span><span>Delete</span></a>';
+#			echo '<a href=""><span><img src="static/gfx/icon-delete.svg" alt=""></span><span>Delete</span></a>';
 			}
 		}
 	echo '</div>
@@ -142,8 +146,8 @@ foreach(Secret::getSecretsForProfile() as $secret) {
 	echo '</div>
         </div></div>
         <div><div>
-            <!-- status box icon -->
-            <div><!-- status box --></div>
+            <img src="static/gfx/icon-cal-0.svg" alt="">
+            <div><div>Last changed by</div><a><img src="static/gfx/no-photo.svg" alt="">' . $author . '</a><div>' . $date . '</div></div>
         </div></div>
     </div>' . "\n" ;
 	}
