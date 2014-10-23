@@ -6,11 +6,12 @@
  */
 
 $title = 'Giza – Help page' ;
-include '../_header.php' ;
+$path = '../' ;
+include $path . '_header.php' ;
 
-echo '<h1><img src="../static/gfx/icon-rank-3.svg" alt="">Giza</h1>
+echo '<h1><img src="' . $path . 'static/gfx/icon-rank-3.svg" alt="">Giza</h1>
 <div id="giza-tabs">
-<a href="../">Secrets</a> <a href="../new/">New secret</a> <a href="../profile/">Profile</a> <span id="giza-tabs-selected">Help</span>
+<a href="' . $path . '">Secrets</a> <a href="' . $path . 'new/">New secret</a> <a href="' . $path . 'profile/">Profile</a> <span id="giza-tabs-selected">Help</span>
 </div>
 <div id="giza-sheet">
 
@@ -21,14 +22,14 @@ the order of lines in the output; invoked twice it effecively does nothing, but 
 first one).<p>
 
 <p>In order to simplify the usage, it is preferable to install a client program which parses the files received from the server and invokes the appropriate PGP commands. A 
-<code>bash</code> implementation can be found here: <code><a href="../static/app/bash-app/giza.sh">giza.sh</a></code></p>
+<code>bash</code> implementation can be found here: <code><a href="' . $path . 'static/app/bash-app/giza.sh">giza.sh</a></code></p>
 
 <p>This program needs to be made executable, and chosen as the handler for the contnet-type <code>application/x-giza</code>. It requires that the GPG suite is installed on the 
 system.</p>
 
 </div>' ;
 
-include '../_footer.php' ;
+include $path . '_footer.php' ;
 
 ?>
 

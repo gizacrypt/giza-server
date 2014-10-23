@@ -56,9 +56,10 @@ if ($uploaded = file_get_contents('php://input')) {
 }
 
 $title = 'Giza' ;
-include './_header.php' ;
+$path = './' ;
+include $path . '_header.php' ;
 
-echo '<h1><img src="static/gfx/icon-rank-3.svg" alt="">Giza</h1>
+echo '<h1><img src="' . $path . 'static/gfx/icon-rank-3.svg" alt="">Giza</h1>
 <div id="giza-tabs">
 <span id="giza-tabs-selected">Secrets</span> <a href="new/">New secret</a> <a href="profile/">Profile</a> <a href="help/">Help</a>
 </div>
@@ -101,31 +102,31 @@ foreach(Secret::getSecretsForProfile() as $secret) {
 
 	echo '    <div' . (($readable)?'':' class="unavailable"') . '>
         <div><div>
-            <img src="static/gfx/icon-menu-' . $accesslevel . '.svg" alt="">
+            <img src="' . $path . 'static/gfx/icon-menu-' . $accesslevel . '.svg" alt="">
             <div>';
 	$link = (($readable)?' href="?' . qs(['uuid' => $secret->getUUID(), 'action' => 'read', 'method' => 'view']) . '"':'');
-	echo '<a' . $link . '><span><img src="static/gfx/icon-view.svg" alt=""></span><span>Decrypt &amp; view</span></a>';
+	echo '<a' . $link . '><span><img src="' . $path . 'static/gfx/icon-view.svg" alt=""></span><span>Decrypt &amp; view</span></a>';
 
 	$link = (($readable)?' href="?' . qs(['uuid' => $secret->getUUID(), 'action' => 'read', 'method' => 'save']) . '"':'');
-	echo '<a' . $link . '><span><img src="static/gfx/icon-download.svg" alt=""></span><span>Decrypt &amp; save plaintext</span></a>';
+	echo '<a' . $link . '><span><img src="' . $path . 'static/gfx/icon-download.svg" alt=""></span><span>Decrypt &amp; save plaintext</span></a>';
 
-#	echo '<a href=""><span><img src="static/gfx/icon-update.svg" alt=""></span><span>Update with new users</span></a>';
+#	echo '<a href=""><span><img src="' . $path . 'static/gfx/icon-update.svg" alt=""></span><span>Update with new users</span></a>';
 
 	if ($accesslevel >= 2) {
 		$link = (($readable)?' href="?' . qs(['uuid' => $secret->getUUID(), 'action' => 'write', 'method' => 'edit']) . '"':'');
-		echo '<a' . $link . '><span><img src="static/gfx/icon-edit.svg" alt=""></span><span>Edit</span></a>';
+		echo '<a' . $link . '><span><img src="' . $path . 'static/gfx/icon-edit.svg" alt=""></span><span>Edit</span></a>';
 
 		$link = ' href="?' . qs(['uuid' => $secret->getUUID(), 'action' => 'write', 'method' => 'upload']) . '"';
-		echo '<a' . $link . '><span><img src="static/gfx/icon-upload.svg" alt=""></span><span>Upload new version</span></a>';
+		echo '<a' . $link . '><span><img src="' . $path . 'static/gfx/icon-upload.svg" alt=""></span><span>Upload new version</span></a>';
 
-#		echo '<a href=""><span><img src="static/gfx/icon-revert.svg" alt=""></span><span>Revert to previous version</span></a>';
+#		echo '<a href=""><span><img src="' . $path . 'static/gfx/icon-revert.svg" alt=""></span><span>Revert to previous version</span></a>';
 
-#		echo '<a href=""><span><img src="static/gfx/icon-history.svg" alt=""></span><span>Full history</span><span><img src="gfx/icon-more.svg" alt=""></span></a>';
+#		echo '<a href=""><span><img src="' . $path . 'static/gfx/icon-history.svg" alt=""></span><span>Full history</span><span><img src="gfx/icon-more.svg" alt=""></span></a>';
 
 		if ($accesslevel == 3) { 
-#			echo '<a href=""><span><img src="static/gfx/icon-gears.svg" alt=""></span><span>Users &amp; properties</span><span><img src="gfx/icon-more.svg" alt=""></span></a>';
+#			echo '<a href=""><span><img src="' . $path . 'static/gfx/icon-gears.svg" alt=""></span><span>Users &amp; properties</span><span><img src="gfx/icon-more.svg" alt=""></span></a>';
 
-#			echo '<a href=""><span><img src="static/gfx/icon-delete.svg" alt=""></span><span>Delete</span></a>';
+#			echo '<a href=""><span><img src="' . $path . 'static/gfx/icon-delete.svg" alt=""></span><span>Delete</span></a>';
 			}
 		}
 	echo '</div>
@@ -134,27 +135,27 @@ foreach(Secret::getSecretsForProfile() as $secret) {
             <a href="?' . qs(['uuid' => $secret->getUUID(), 'action' => 'read', 'method' => 'view']) . '">' . o($secret->getName()) . '</a>
         </div>
         <div><div>
-            <img src="static/gfx/icon-users' . (($missing)?'-missing':'') . (($expired)?'-expired':'') . '.svg" alt="">
+            <img src="' . $path . 'static/gfx/icon-users' . (($missing)?'-missing':'') . (($expired)?'-expired':'') . '.svg" alt="">
             <div>';
 	foreach ($userlist as $user) {
 		echo '<a href="#"' . (($user['missing'])?' class="missing"':'') . (($user['expired'])?' class="expired"':'') . '>' .
-		'<span><img src="static/gfx/no-photo.svg" alt=""></span>' .
+		'<span><img src="' . $path . 'static/gfx/no-photo.svg" alt=""></span>' .
 		'<span>' . $user['name'] . '</span>' .
-		'<span><img src="static/gfx/icon-rank-' . $user['accesslevel'] . '.svg" alt=""></span>' .
+		'<span><img src="' . $path . 'static/gfx/icon-rank-' . $user['accesslevel'] . '.svg" alt=""></span>' .
 		'</a>';
 		}
 	echo '</div>
         </div></div>
         <div><div>
-            <img src="static/gfx/icon-cal-0.svg" alt="">
-            <div><div>Last changed by</div><a><img src="static/gfx/no-photo.svg" alt="">' . $author . '</a><div>' . $date . '</div></div>
+            <img src="' . $path . 'static/gfx/icon-cal-0.svg" alt="">
+            <div><div>Last changed by</div><a><img src="' . $path . 'static/gfx/no-photo.svg" alt="">' . $author . '</a><div>' . $date . '</div></div>
         </div></div>
     </div>' . "\n" ;
 	}
 
 echo '</div>'."\n" . '</div>'."\n" ;
 
-include './_footer.php' ;
+include $path . '_footer.php' ;
 
 ?>
 
