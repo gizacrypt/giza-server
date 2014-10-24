@@ -24,8 +24,8 @@ first one).<p>
 <p>In order to simplify the usage, it is preferable to install a client program which parses the files received from the server and invokes the appropriate PGP commands. A 
 <code>bash</code> implementation can be found here: <code><a href="' . $path . 'static/app/bash-app/giza.sh">giza.sh</a></code></p>
 
-<p>This program needs to be made executable, and chosen as the handler for the contnet-type <code>application/x-giza</code>. It requires that the GPG suite is installed on the 
-system.</p>
+<p>This program needs to be made executable, and chosen as the handler for the content-type <code>application/x-giza</code>. It requires that the GPG suite (<code>gpg</code> and 
+<code>gpg-agent</code>) is installed on the system.</p>
 
 </div>' ;
 
