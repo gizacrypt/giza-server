@@ -11,6 +11,15 @@ use \uninett\giza\identity\Profile ;
 function o($str) { return htmlspecialchars($str); }
 function qs($arr) { return o(http_build_query($arr)); }
 
+$path = './' ;
+
+try	{
+	$profile = uninett\giza\identity\Profile::fromStore() ;
+} catch	(RuntimeException $e) {
+	header('Location: ' . $path . 'profile/', true, 303);
+	exit ;
+}
+
 if ($uploaded = file_get_contents('php://input')) {
 	try {
 		$params = [];
@@ -56,7 +65,6 @@ if ($uploaded = file_get_contents('php://input')) {
 }
 
 $title = 'Giza' ;
-$path = './' ;
 include $path . '_header.php' ;
 
 echo '<h1><img src="' . $path . 'static/gfx/icon-rank-3.svg" alt="">Giza</h1>
