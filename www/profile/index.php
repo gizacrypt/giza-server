@@ -27,16 +27,16 @@ $title = 'Profile';
 ?><!DOCTYPE html>
 <title><?php htmlentities($title); ?></title>
 <?php
-if (is_null($storedProfile)) {
+if (!isset($storedProfile)) {
 	echo "<form action=\"./\" method=\"post\">\n";
 }
 echo '<p>Source: ' . (isset($storedProfile) ? 'store' : 'attribute source');
 echo "\n";
-if (is_null($storedProfile)) {
+if (!isset($storedProfile)) {
 	echo "<input type=\"submit\" name=\"storeProfile\" value=\"Store profile\"/>\n";
 }
 echo "</p>\n";
-if (is_null($storedProfile)) {
+if (!isset($storedProfile)) {
 	echo "</form>\n";
 }
 ?>
