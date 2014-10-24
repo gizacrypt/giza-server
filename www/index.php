@@ -6,10 +6,15 @@
  */
 
 use \uninett\giza\secret\Secret ;
+use \uninett\giza\secret\Metadata ;
 use \uninett\giza\identity\Profile ;
 
 function o($str) { return htmlspecialchars($str); }
 function qs($arr) { return o(http_build_query($arr)); }
+function accesslevel(Metadata $metadata, Profile $profile = NULL) { 
+	return (($metadata->hasPermission(Secret::ACCESS_WRITE, $profile))?
+                (($metadata->hasPermission(Secret::ACCESS_ADMIN, $profile))?3:2):1) ;
+}
 
 if ($uploaded = file_get_contents('php://input')) {
 	try {
@@ -75,19 +80,17 @@ echo '<h1><img src="' . $path . 'static/gfx/icon-rank-3.svg" alt="">Giza</h1>
 <div id="giza-view">'."\n";
 
 foreach(Secret::getSecretsForProfile() as $secret) {
-	$accesslevel = (($secret->getMetadata()->hasPermission(Secret::ACCESS_WRITE))?
-		(($secret->getMetadata()->hasPermission(Secret::ACCESS_ADMIN))?3:2):1) ;
+	$accesslevel = accesslevel($secret->getMetadata()) ;
 	$readable = $secret->isReadableByProfile() ;
 	$userlist = [];
 	$expired = FALSE ;
 	$missing = FALSE ;
 	foreach ($secret->getMetadata()->getIdentities() as $profile) {
-		$bitmask = $secret->getMetadata()->getPermissions($profile) ;
 		$userlist[$profile->getUniqueId()] = array (
 			'expired' => FALSE ,
 			'missing' => TRUE ,
 			'name' => $profile->getDisplayName() ,
-			'accesslevel' => 1 + ($bitmask&2 != 0) + ($bitmask&1 != 0)
+			'accesslevel' => accesslevel($secret->getMetadata(), $profile)
 			) ;
 		}
 	foreach ($secret->getIdentities() as $profile) {

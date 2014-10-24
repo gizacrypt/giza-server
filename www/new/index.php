@@ -44,16 +44,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' || $_SERVER['QUERY_STRING']) {
 	exit;
 }
 
+$title = 'Giza – Help page' ;
+$path = '../' ;
+include $path . '_header.php' ;
+
+echo '<h1><img src="' . $path . 'static/gfx/icon-rank-3.svg" alt="">Giza</h1>
+<div id="giza-tabs">
+<a href="' . $path . '">Secrets</a> <span id="giza-tabs-selected">New secret</span> <a href="' . $path . 'profile/">Profile</a> <a href="' . $path . 'help/">Help</a>
+</div>
+<div id="giza-sheet">' ;
+
 ?>
 
 <form action="./" method="post">
-<h1>Name</h1>
-<p>
-	<input type="text" name="name">
-</p>
+<h2>Create new secret</h2>
 
-<h1>Content-Type</h1>
-<p>
+<div style="vertical-align: top">
+<div style="display: inline-block ; width: 50%">
+	<h3>Name</h3> <input type="text" name="name">
+</div>
+
+<div style="display: inline-block ; width: 50%">
+	<h3>Content-Type</h3>
 	<div>
 		<input type="radio" name="content-type" value="password" id="content-type-password" checked>
 		<label for="content-type-password">password</label>
@@ -76,10 +88,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' || $_SERVER['QUERY_STRING']) {
 		<input type="radio" name="content-type" value="input" id="content-type-input">
 		<label for="content-type-input"><input type="text" name="content-type-input"></label>
 	</div>
-</p>
+</div>
+</div>
 
-<h1>Access</h1>
-<p>
+<div>
+<h3>Access list</h3>
 <?php
 $uid = \uninett\giza\identity\Profile::fromStore()->getUniqueID();
 foreach(\uninett\giza\identity\Profile::getActiveProfiles() as $profile) {
@@ -105,6 +118,16 @@ foreach(\uninett\giza\identity\Profile::getActiveProfiles() as $profile) {
 	}
 }
 ?>
-</p>
+</div>
 
 <p><input type="submit" value="Stage new secret"></p>
+
+</form>
+</div>
+
+<?php
+
+include $path . '_footer.php' ;
+
+?>
+
