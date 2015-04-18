@@ -3,7 +3,7 @@
 /**
  *
  * @author Jørn Åne de Jong <jorn.dejong@uninett.no>
- * @copyright Copyright (c) 2014, UNINETT
+ * @copyright Copyright (c) 2014-2015, UNINETT
  */
 
 $candidateProfile = uninett\giza\identity\Profile::fromAuthentication();

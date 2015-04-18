@@ -2,7 +2,8 @@
 
 /**
  *
- * @copyright Copyright (c) 2014, UNINETT
+ * @author Jørn Åne de Jong <jorn.dejong@uninett.no>
+ * @copyright Copyright (c) 2014-2015, UNINETT
  */
 
 use \uninett\giza\secret\Secret ;
