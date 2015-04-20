@@ -10,9 +10,15 @@ $saml = new \uninett\giza\identity\saml\SimpleSamlAttributeSource([
 ]);
 return [
 
-	'secretStore' => new \uninett\giza\secret\storage\file\FileSecretStore(dirname(__DIR__) . '/var/secret'),
+	'secretStore' => new \uninett\giza\secret\storage\file\FileSecretStore(
+		implode(DIRECTORY_SEPARATOR, [dirname(__DIR__), 'var', 'secret'])
+	),
 
 	'identitySource' => $saml,
+
+	'identityStore' => new \uninett\giza\identity\file\FileProfileStore(
+		implode(DIRECTORY_SEPARATOR, [dirname(__DIR__), 'var', 'profile'])
+	),
 
 	'auxiliaryIdentitySources' => [
 		'SAML' => $saml,
@@ -21,14 +27,10 @@ return [
 		),
 	],
 
-	'identityStore' => new \uninett\giza\identity\file\FileProfileStore(
-		dirname(__DIR__) . '/var/profile'
-	),
-
 	'gpgBinaryPath' => '/usr/bin/gpg',
 
-	'gpgHomedirPath' => dirname(__DIR__) . '/var/gnupg',
+	'gpgHomedirPath' => implode(DIRECTORY_SEPARATOR, [dirname(__DIR__), 'var', 'gnupg']),
 
-	'standardIdentityImage' => dirname(__DIR__) . '/www/static/gfx/no-photo.svg',
+	'standardIdentityImage' => implode(DIRECTORY_SEPARATOR, [dirname(__DIR__), 'www', 'static', 'gfx', 'no-photo.svg']),
 
 ];

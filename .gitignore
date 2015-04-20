@@ -1,4 +1,4 @@
-doc
-src
-etc/giza.conf.php
-var
+/doc
+/etc/giza.conf.php
+/src
+/var

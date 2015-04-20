@@ -1,4 +1,4 @@
-<?php require_once dirname(__DIR__) . '/src/_autoload.php';
+<?php require_once implode(DIRECTORY_SEPARATOR, [dirname(__DIR__), 'src', '_autoload.php']);
 
 /**
  *
