@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	if (isset($_POST['storeProfile'])) {
 		$candidateProfile->store();
 	}
-	header('Location: https://' . $_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
+	header('Location: ' . (empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == 'off' ? 'http' : 'https') . '://' . $_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
 }
 
 try {

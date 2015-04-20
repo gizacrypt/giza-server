@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	])->generateOutput();
 	exit;
 }
-if ($_SERVER['REQUEST_METHOD'] == 'POST' || $_SERVER['QUERY_STRING']) {
+if ($_SERVER['REQUEST_METHOD'] == 'POST' || isset($_SERVER['QUERY_STRING'])) {
 	header('Location: ' . getBaseURL(), true, 301);
 	exit;
 }

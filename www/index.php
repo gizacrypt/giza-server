@@ -52,7 +52,7 @@ if ($uploaded = file_get_contents('php://input')) {
 } elseif (isset($_GET['uuid'])) {
 	Secret::getSecret($_GET['uuid'])->generateOutput($_GET);
 	exit;
-} elseif ($_SERVER['QUERY_STRING']) {
+} elseif (isset($_SERVER['QUERY_STRING'])) {
 	header('Location: ' . (empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == 'off' ? 'http' : 'https')
 			. '://'
 			. $_SERVER['HTTP_HOST']
